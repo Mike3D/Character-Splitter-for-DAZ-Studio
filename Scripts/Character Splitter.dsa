@@ -96,7 +96,7 @@ function GetProductDir(node)
 		case 'Genesis9Eyes': figPath = 'Genesis 9/Genesis 9 Eyes'; break;
 		case 'Genesis9Mouth': figPath = 'Genesis 9/Genesis 9 Mouth'; break;
 		case 'G9EyebrowCards': figPath = 'Genesis 9/Genesis 9 Eyebrows'; break;
-		default: logBox.insertItem('☠ GetProductDir() %1 not found'.arg(n));
+		default: logBox.insertItem('☠ GetProductDir() %1 not found'.arg(node.name));
 	}
 
 	return 'data/DAZ 3D/%1/Morphs/%2/%3'.arg(figPath).arg(vendor.text).arg(product.text);
