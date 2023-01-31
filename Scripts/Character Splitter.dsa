@@ -71,28 +71,33 @@ function GetProductDir(node)
 {
 	if (!node)
 		node = oNode;
-	var n = node.name;
 
 	var figPath = '';
-	if (n === 'Genesis') figPath = 'Genesis/Base';
-	else if (n === 'Genesis2Female') figPath = 'Genesis 2/Female';
-	else if (n === 'Genesis2Male') figPath = 'Genesis 2/Male';
-	else if (n === 'Genesis3Female') figPath = 'Genesis 3/Female';
-	else if (n === 'Genesis3Male') figPath = 'Genesis 3/Male';
-	else if (n === 'Genesis8Female') figPath = 'Genesis 8/Female';
-	else if (n === 'Genesis8FemaleEyelashes') figPath = 'Genesis 8/Female Eyelashes';
-	else if (n === 'Genesis8Male') figPath = 'Genesis 8/Male';
-	else if (n === 'Genesis8_1Female') figPath = 'Genesis 8/Female 8_1';
-	else if (n === 'Genesis8_1FemaleEyelashes') figPath = 'Genesis 8/Female 8_1 Eyelashes';
-	else if (n === 'Female 8_1 Tear') figPath = 'Genesis 8/Female 8_1 Tear';
-	else if (n === 'Genesis8_1Male') figPath = 'Genesis 8/Male 8_1';
-	else if (n === 'Genesis9') figPath = 'Genesis 9/Base';
-	else if (n === 'Genesis9Eyelashes') figPath = 'Genesis 9/Genesis 9 Eyelashes';
-	else if (n === 'Genesis9Tear') figPath = 'Genesis 9/Genesis 9 Tear';
-	else if (n === 'Genesis9Eyes') figPath = 'Genesis 9/Genesis 9 Eyes';
-	else if (n === 'Genesis9Mouth') figPath = 'Genesis 9/Genesis 9 Mouth';
-	else if (n === 'G9EyebrowCards') figPath = 'Genesis 9/Genesis 9 Eyebrows';
-	else logBox.insertItem('☠ GetProductDir() %1 not found'.arg(n));
+	switch (node.name)
+	{
+		case 'Genesis': figPath = 'Genesis/Base'; break;
+		case 'Genesis2Female': figPath = 'Genesis 2/Female'; break;
+		case 'Genesis2Male': figPath = 'Genesis 2/Male'; break;
+		case 'Genesis3Female': figPath = 'Genesis 3/Female'; break;
+		case 'Genesis3Male': figPath = 'Genesis 3/Male'; break;
+		case 'Genesis8Female': figPath = 'Genesis 8/Female'; break;
+		case 'Genesis8FemaleEyelashes': figPath = 'Genesis 8/Female Eyelashes'; break;
+		case 'Genesis8Male': figPath = 'Genesis 8/Male'; break;
+		case 'Genesis8MaleEyelashes': figPath = 'Genesis 8/Male Eyelashes'; break;
+		case 'Genesis8_1Female': figPath = 'Genesis 8/Female 8_1'; break;
+		case 'Genesis8_1FemaleEyelashes': figPath = 'Genesis 8/Female 8_1 Eyelashes'; break;
+		case 'Female 8_1 Tear': figPath = 'Genesis 8/Female 8_1 Tear'; break;
+		case 'Genesis8_1Male': figPath = 'Genesis 8/Male 8_1'; break;
+		case 'Genesis8_1MaleEyelashes': figPath = 'Genesis 8/Male 8_1 Eyelashes'; break;
+		case 'Male 8_1 Tear': figPath = 'Genesis 8/Male 8_1 Tear'; break;
+		case 'Genesis9': figPath = 'Genesis 9/Base'; break;
+		case 'Genesis9Eyelashes': figPath = 'Genesis 9/Genesis 9 Eyelashes'; break;
+		case 'Genesis9Tear': figPath = 'Genesis 9/Genesis 9 Tear'; break;
+		case 'Genesis9Eyes': figPath = 'Genesis 9/Genesis 9 Eyes'; break;
+		case 'Genesis9Mouth': figPath = 'Genesis 9/Genesis 9 Mouth'; break;
+		case 'G9EyebrowCards': figPath = 'Genesis 9/Genesis 9 Eyebrows'; break;
+		default: logBox.insertItem('☠ GetProductDir() %1 not found'.arg(n));
+	}
 
 	return 'data/DAZ 3D/%1/Morphs/%2/%3'.arg(figPath).arg(vendor.text).arg(product.text);
 }
