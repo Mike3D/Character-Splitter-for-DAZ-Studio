@@ -26,10 +26,10 @@ The focus of this method is to faithfully preserve the proportions of your chara
 Note that you can freely rescale your figure before executing the script. This is useful if you want your character to be a few inches taller or shorter than the base figure.
 
 ## Create morphs from any shape
-As a bonus, you can use this script to create morphs from any shape (figure or prop). To do so, just uncheck the 'Split Shape Using a DFormer' option, found in the 'Settings' Tab. This disables the 'Body' & 'CTRL' Tabs, which are not longer relevant.
+As a bonus, you can use this script to create morphs from any shape (figure or prop). To do so, just uncheck the 'Split Shape Using a DFormer' option, found in the 'Settings' Tab. This disables the 'Body' & 'CTRL' Tabs, which are no longer relevant.
 
 ## Create morphs for head components (G8/G9) : eyelashes, tear, mouth, eyes & eyebrows
-Morphs for head components are created for each one. However, if you didn't modify the geometry for some components, you don't want to create morphs for them. In this case, simply delete these parts after loading the base figure into the Scene.
+A morphs is created for each head component. However, if you didn't modify the geometry for some components, you don't want to create morphs for them. In this case, simply delete these parts after loading the base figure into the Scene.
 
 ## Customize everything from the GUI
 The first 4 tabs of the GUI allow to tailor everything to suit your needs, allowing you to create a production-ready split character.
