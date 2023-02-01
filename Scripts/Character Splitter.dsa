@@ -172,9 +172,20 @@ function SetPresentation(node, prop, name)
 //=========================
 function CreateCTRL()
 {
-	// Create a new property
 	var name = ctrl_name.text;
-	var prop = new DzFloatProperty(name, true, false);
+	var prop = oNode.findProperty(name);
+
+	// If property already exists, rename it with a random name - Note: we don't remove existing property, as this takes eons when you have hundreds of morphs for your figure
+	if (prop != null)
+	{
+		var randName = (Math.random() * 1e32).toString(36);
+		prop.name = randName;
+		prop.setLabel(randName);
+		prop = null;
+	}
+
+	// Create a new property
+	prop = new DzFloatProperty(name, true, false);
 	prop.setLabel(ctrl_label.text);
 	prop.setPath(ctrl_path.getSelectionPath().join('/'));
 	prop.setIsClamped(true); // Use Limits
@@ -188,7 +199,12 @@ function CreateCTRL()
 	SetPresentation(oNode, prop, name);
 
 	// Add property to oNode
-	oNode.addProperty(prop);
+	var error = oNode.addProperty(prop);
+	if (error.valueOf() !== 0x00000000)
+	{
+		logBox.insertItem('☠ %1  |  Error while adding controller to node : %2'.arg(name).arg(getErrorMessage(error)));
+		return;
+	}
 
 	logBox.insertItem('✔ %1  |  Created (controller)'.arg(name));
 
@@ -389,19 +405,32 @@ function CreateDeltas(invert)
 //=========================
 function CreateMorph(node, deltas, mLabel, mName, mPath)
 {
+	var prop = helper.findControlProperty(mName, node, true, true); // Get morph object (DzProperty)
+
+	// If property already exists, rename its morph with a random name - Note: we don't remove existing morph or property, as this takes eons when you have hundreds of morphs for your figure
+	if (prop != null)
+		prop.getOwner().name = (Math.random() * 1e32).toString(36); // Rename garbage morph
+
+	// Create new morph
 	var mod = new DzMorph(deltas);
 	mod.setLabel(mLabel);
 	mod.setName(mName);
 
-	node.getObject().addModifier(mod);
+	var error = node.getObject().addModifier(mod);
+	if (error.valueOf() !== 0x00000000)
+	{
+		logBox.insertItem('☠ %1  |  Error while adding morph to node : %2'.arg(mName).arg(getErrorMessage(error)));
+		return;
+	}
 
-	var prop = helper.findControlProperty(mLabel, node, true, true); // Get morph object (DzProperty)
+	prop = helper.findControlProperty(mName, node, true, true); // Get morph object (DzProperty)
+
 	if (prop != null)
 	{
 		prop.setPath(mPath);
 		prop.setIsClamped(true); // Use Limits
 		prop.setCanAutoFollow(true);
-		prop.setMin(0);
+		prop.setMinMax(0, 1);
 		var card = mLabel === morphLabel.text ? selectedCard.text : selectedCard2.text;
 		var present = SetPresentation(node, prop, mName);
 		morphs.push(prop); // Store morph (waiting for batch post-processing)
@@ -457,28 +486,7 @@ function FindDFormer()
 	}
 
 	if (!issue.isEmpty())
-		WarningDialog(issue); // Spawn warning dialog
-}
-
-//=========================
-// Spawn warning dialog when finding DFormer issues
-//=========================
-function WarningDialog(issue)
-{
-	// Create a dialog
-	var dlg = new DzDialog();
-	dlg.caption = '☠ WARNING';
-	dlg.setFixedSize(200, 80);
-
-	var dlgGB = new DzVGroupBox(dlg);
-
-	var gbox = new DzVGroupBox(dlgGB); gbox.title = 'Deformer Issue';
-	gbox.setFixedSize(190, 70);
-	Label(gbox, '\n%1'.arg(issue));
-
-	// Spawn the dialog & wait
-	processEvents();
-	dlg.exec();
+		MessageBox.warning('\n%1'.arg(issue), 'DFormer Issue', 'OK', '');
 }
 
 //=========================
@@ -677,7 +685,6 @@ function Execute()
 
 		// Save as morph asset
 		WriteMorph(node, morph.name);
-
 	}
 
 	if (doSplit.checked && ctrl.checked)
