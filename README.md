@@ -9,6 +9,7 @@
 * Head split DFormer presets included for all the Genesis figures
 * Ability to setup morphs 'presentation' (images & colors)
 * Ability to create a morph from any shape
+* Ability to delete any unwanted morphs
 * Accuracy : the body morph doesn't include deltas pertaining to the head (only body & neck)
 * Full control over the final result
 * Fully automated
@@ -30,6 +31,12 @@ As a bonus, you can use this script to create morphs from any shape (figure or p
 
 ## Create morphs for head components (G8/G9) : eyelashes, tear, mouth, eyes & eyebrows
 A morphs is created for each head component. However, if you didn't modify the geometry for some components, you don't want to create morphs for them. In this case, simply delete these parts after loading the base figure into the Scene.
+
+## Delete any unwanted morphs
+Last Tab of the GUI allows to delete any unwanted morphs. This is especially useful :
+* in case something went wrong at any step of the process
+* if you want to 'overwrite' an existing morph
+* if you just want to definitively suppress any morph from your figure
 
 ## Customize everything from the GUI
 The first 4 tabs of the GUI allow to tailor everything to suit your needs, allowing you to create a production-ready split character.
