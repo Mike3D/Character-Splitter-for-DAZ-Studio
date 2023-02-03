@@ -22,7 +22,9 @@ var scaleMat; // DzMatrix3
 var morphs = [];
 var offset = 0; // float
 var weights; // DzWeightMap
-var figures = [];
+var figures = []; // Head components
+var delView; // DzListView
+var morph_items = [];
 
 var helper = new DzSceneHelper();
 
@@ -47,6 +49,22 @@ function GetMorphsPaths()
 		}
 	}
 	return out;
+}
+
+//=========================
+// Collect Head figures to process (Eyelashes, Mouth, Eyes, Tear, Eyebrow Cards)
+//=========================
+function GetFigures()
+{
+	figures = [];
+	var nodes = oNode.getNodeChildren();
+
+	for (var i = 0; i < nodes.length; i++)
+	{
+		var n = nodes[i];
+		if (n.inherits('DzFigure'))
+			figures.push(n);
+	}
 }
 
 //=========================
@@ -554,6 +572,8 @@ function ValidateSetup()
 
 function Execute()
 {
+	morphs = [];
+
 	// Show Log Report (tab #5)
 	tabs.setCurrentWidget(tab5);
 
@@ -561,14 +581,7 @@ function Execute()
 	startProgress('Starting process', 1, true, true); // 1 step, cancellable, show time
 
 	// Collect figures to process (Base figure, Eyelashes, Mouth, Eyes, Tear, Eyebrow Cards)
-	var nodes = oNode.getNodeChildren();
-
-	for (var i = 0; i < nodes.length; i++)
-	{
-		var n = nodes[i];
-		if (n.inherits('DzFigure'))
-			figures.push(n);
-	}
+	GetFigures();
 
 	// Set resolution to 'Base' & 'SubD' to 0 for each figure
 	for (var i = 0; i < figures.length; i++)
@@ -758,11 +771,11 @@ function CardSelect(parent, placeHolder, tip)
 // Window
 //==================
 var window = new DzDialog(); window.caption = 'Character Splitter';
-window.minWidth = 300;
+window.minWidth = 310;
 var layout = new DzBoxLayout(window);
 
 //==================
-// Display 5 tabs
+// Display 6 tabs
 //==================
 var tabs = new DzTabWidget(window);
 layout.addWidget(tabs, 0, 0);
@@ -771,6 +784,7 @@ var tab2 = new DzVGroupBox(tabs); tabs.addTab(tab2, 'Body'); tabs.setTabToolTip(
 var tab3 = new DzVGroupBox(tabs); tabs.addTab(tab3, 'CTRL'); tabs.setTabToolTip(2, 'Controller for Head + Body (used to apply full character)');
 var tab4 = new DzVGroupBox(tabs); tabs.addTab(tab4, 'Settings');
 var tab5 = new DzVGroupBox(tabs); tabs.addTab(tab5, 'Log');
+var tab6 = new DzVGroupBox(tabs); tabs.addTab(tab6, '☠');
 
 //==================================  Tab #1 'Morph #1'  =================================
 
@@ -780,9 +794,9 @@ var tab5 = new DzVGroupBox(tabs); tabs.addTab(tab5, 'Log');
 var groupbox1_1 = new DzVGroupBox(tab1);
 var layout1_1 = new DzGridLayout(groupbox1_1);
 var morphName = LabelledLineEdit(groupbox1_1, layout1_1, 0, 'Name', 35, 'Morph Name');
-connect(morphName, 'editingFinished()', function() { CheckDupliName(morphName, morphLabel); });
+connect(morphName, 'editingFinished()', function() { CheckDupliName(morphName, morphLabel, morph1Name); });
 
-function CheckDupliName(srcName, srcLabel)
+function CheckDupliName(srcName, srcLabel, srcDel)
 {
 	var name = srcName.text;
 
@@ -791,7 +805,9 @@ function CheckDupliName(srcName, srcLabel)
 		srcName.clear();
 		srcName.placeholderText = '%1 already exists'.arg(name);
 	}
+
 	srcLabel.text = srcName.text;
+	srcDel.text = srcName.text;
 }
 
 //==================
@@ -840,7 +856,7 @@ function on_selectCardBtn_click(dest)
 var groupbox2_1 = new DzVGroupBox(tab2);
 var layout2_1 = new DzGridLayout(groupbox2_1);
 var morphName2 = LabelledLineEdit(groupbox2_1, layout2_1, 0, 'Name', 35, 'Morph Name');
-connect(morphName2, 'editingFinished()', function() { CheckDupliName(morphName2, morphLabel2); });
+connect(morphName2, 'editingFinished()', function() { CheckDupliName(morphName2, morphLabel2, morph2Name); });
 
 //==================
 // Display 'Morph Label 2' line edit
@@ -875,7 +891,7 @@ var selectedCard2 = CardSelect(groupbox2_2, 'Optional : browse to your image fil
 var groupbox3_1 = new DzVGroupBox(tab3); groupbox3_1.title = 'Controller Morph';
 var layout3_1 = new DzGridLayout(groupbox3_1);
 var ctrl_name = LabelledLineEdit(groupbox3_1, layout3_1, 0, 'Name', 35, 'Morph Controller Name');
-connect(ctrl_name, 'editingFinished()', function() { CheckDupliName(ctrl_name, ctrl_label); });
+connect(ctrl_name, 'editingFinished()', function() { CheckDupliName(ctrl_name, ctrl_label, morph3Name); });
 
 //==================
 // Display 'Controller Label' line edit
@@ -960,6 +976,149 @@ var logBox = new DzListBox(groupbox5);
 
 // Find DFormer and throw a warning if not found
 var deformerIssue = FindDFormer();
+
+//==================================  Tab #6 '☠'  =================================
+var groupbox6_1 = new DzVGroupBox(tab6); groupbox6_1.title = 'Morphs To Delete';
+var layout6_1 = new DzGridLayout(groupbox6_1);
+
+//==================
+// Display 3 slots for morph names
+//==================
+var morph1Name = LabelledLineEdit(groupbox6_1, layout6_1, 0, 'Head Name', 60, 'Morph Name');
+var morph2Name = LabelledLineEdit(groupbox6_1, layout6_1, 1, 'Body Name', 60, 'Morph Name');
+var morph3Name = LabelledLineEdit(groupbox6_1, layout6_1, 2, 'CTRL Name', 60, 'Morph Name');
+
+//==================
+// Display 'Find Morph(s)' button
+//==================
+var groupbox6_2 = new DzVGroupBox(tab6);
+var layout6_2 = new DzGridLayout(groupbox6_2);
+
+var button_find = new DzPushButton(groupbox6_2); button_find.text = 'Find Morph(s)';
+connect(button_find, 'clicked()', function() { FindMorphs(); });
+
+function FindMorphs()
+{
+	// Create List View
+	if (!delView)
+	{
+		delView = new DzListView(groupbox6_2);
+
+		var items = ['Morph', 'Author', 'Path'];
+		for (var i = 0; i < items.length; i++)
+		{
+			delView.addColumn(items[i]);
+			delView.setColumnWidthMode(i, 0);
+		}
+		delView.setColumnWidth(0, 80);
+		delView.setColumnWidth(1, 80);
+		delView.setColumnWidth(2, 110);
+		delView.allColumnsShowFocus = true;
+	}
+
+	delView.clear();
+
+	// Get morph names
+	var names = [morph1Name.text, morph2Name.text, morph3Name.text].filter(Boolean);
+	if (names.length <= 0)
+		return;
+
+	// Get all figures (Base & Head components)
+	GetFigures();
+	figures.unshift(oNode);
+
+	// Search morph names in every figures
+	for (var n = 0; n < figures.length; n++)
+	{
+		var node = figures[n];
+
+		for (var i = 0; i < names.length; i++)
+		{
+			var name = names[i];
+
+			var prop = helper.findControlProperty(name, node, true, true);
+			if (!prop)
+				continue;
+
+			var morph = prop.getOwner();
+			var to_use = morph.inherits('DzNode') ? prop : morph; // Decide whether to use prop (CTRL) or morph (Head & Body)
+
+			var item = DzCheckListItem(delView, DzCheckListItem.CheckBox, delView.childCount);
+			item.setText(0, name); // Name
+			item.setText(1, to_use.assetAuthor.name); // Artist
+			item.setText(2, to_use.assetUri.filePath); // File Path
+			item.on = true;
+			morph_items.push([item, prop, morph]);
+		}
+	}
+
+	if (delView.childCount > 0)
+		groupbox6_3.show();
+}
+
+//==================
+// Display 'Delete Morph(s)' button
+//==================
+var groupbox6_3 = new DzVGroupBox(tab6);
+var layout6_3 = new DzGridLayout(groupbox6_3);
+groupbox6_3.hide();
+
+var button_delete = new DzPushButton(groupbox6_3); button_delete.text = 'Delete Morph(s)'; button_delete.toolTip = 'Delete Selected morph(s)';
+connect(button_delete, 'clicked()', function() { DeleteMorphs(); });
+
+function DeleteMorphs()
+{
+	logBox.insertItem('==========================================');
+
+	for (var i = 0; i < morph_items.length; i++)
+	{
+		var item_data = morph_items[i];
+		var item = item_data[0];
+
+		// Skip unchecked item
+		if (!item.on)
+			continue;
+
+		// Delete dsf file
+		var uri = item.text(2);
+		var success = true;
+
+		if (!uri.isEmpty())
+		{
+			var dir = new DzDir(App.getDataFolderPathBase() + uri.match(/(.*)[\/\\]/)[1]||'');
+			success = dir.remove(uri.split('/').pop());
+
+			// Also remove empty directories in path
+			var p = dir.absolutePath();
+			dir.cdUp();
+			dir.rmpath(p);
+		}
+
+		if (success) // Empty path (unsaved) or successfuly deleted
+		{
+			// Rename morph & label, as they are cached
+			var prop = item_data[1];
+			var morph = item_data[2];
+
+			var randName = (Math.random() * 1e32).toString(36);
+
+			if (morph.inherits('DzNode')) // Controller
+				prop.name = randName;
+			else // Morph (Head or Body)
+				morph.name = randName;
+			prop.setLabel(randName);
+
+			logBox.insertItem('✔ Deleted %1'.arg(uri));
+		}
+		else
+			logBox.insertItem('☠ Failed to delete %1'.arg(uri));
+	}
+
+	logBox.insertItem('==========================================');
+
+	groupbox6_3.hide();
+	FindMorphs(); // Display failed morphs
+}
 
 //============================================= Run the script =============================================
 window.exec(); })(); }
