@@ -26,6 +26,8 @@ var figures = []; // Head components
 var delView; // DzListView
 var morph_items = [];
 
+var imgFilter =  'Image Files (*.dsi *.jpg *.jpeg *.png *.cin *.dds *.dpx *.fits *.hdr *.rgbe *.ico *.iff *.z *.exr *.sxr *.mxr *.ppm *.pgm *.pbm *.pnm *.pfm *.psd *.pdd *.psb *.rla *.sgi *.rgb *.rgba *.bw *.int *.inta *.socket *.pic *.zfile *.tif *.tiff *.tdl *.bmp *.tga *.ptx); DAZ Studio Layered Image (*.dsi); JPEG File (*.jpg *.jpeg); PNG File (*.png); OIIO Files (*.cin *.dds *.dpx *.fits *.hdr *.rgbe *.ico *.iff *.z *.exr *.sxr *.mxr *.ppm *.pgm *.pbm *.pnm *.pfm *.psd *.pdd *.psb *.rla *.sgi *.rgb *.rgba *.bw *.int *.inta *.socket *.pic *.zfile); TIFF Files (*.tif *.tiff *.tdl); BMP file (*.bmp); TGA File (*.tga); PTex Files (*.ptx)';
+
 var helper = new DzSceneHelper();
 
 var paths = GetMorphsPaths(); // Array
@@ -1087,6 +1089,11 @@ function DeleteMorphs()
 		{
 			var dir = new DzDir(App.getDataFolderPathBase() + uri.match(/(.*)[\/\\]/)[1]||'');
 			success = dir.remove(uri.split('/').pop());
+
+			// Remove image cards (could be done with DzContentFile.deleteFile(), but we can only get first file from DzContentFolder class API)
+			var cardNames = dir.entryList(imgFilter);
+			for (var c = 0; c < cardNames.length; c++)
+				dir.remove(cardNames[c]);
 
 			// Also remove empty directories in path
 			var p = dir.absolutePath();
