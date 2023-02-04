@@ -266,17 +266,17 @@ function ERCFreeze(prop, name, node)
 		freezer.addPropertiesToFreeze(nodes[i]); // Add the node's properties
 
 	// Remove junk properties
+	var junk = ['Bone Edge Opacity', 'Bone Fill Opacity', 'DForm', 'Eyelashes Length Upper', 'Eyelashes Length Lower', 'Eyelashes Curl'];
 	var props = freezer.getPropertiesToFreeze();
 	var newProps = [];
 
 	for (var i = 0; i < props.length; i++)
 	{
-		var prop = props[i];
-		var d = prop.getLabel();
-		if (Math.abs(prop.getValue()) < 0.001) // Discard insignificant values
+		var p = props[i];
+
+		if (Math.abs(p.getValue()) < 0.001 || junk.indexOf(p.getLabel()) >= 0) // Discard insignificant values & junk properties
 			continue;
-		if (d.indexOf('Bone Edge Opacity') >= 0 || d.indexOf('Bone Fill Opacity') >= 0 || d.indexOf('DForm') >= 0 || d.indexOf('Eyelashes Length Upper') >= 0 || d.indexOf('Eyelashes Length Lower') >= 0 || d.indexOf('Eyelashes Curl') >= 0)
-			continue;
+
 		newProps.push(prop);
 	}
 	freezer.setPropertiesToFreeze(newProps);
@@ -943,7 +943,7 @@ var normalize = CheckBox(tab4, 'Normalize Figure', 'Whether to rescale morphs to
 //==================
 var groupbox4_1 = new DzVGroupBox(tab4); groupbox4_1.title = 'Morph Asset Settings';
 var layout4_1 = new DzGridLayout(groupbox4_1);
-var vendor = LabelledLineEdit(groupbox4_1, layout4_1, 0, 'Vendor', 40, 'Morph author / folder name inside the Morphs folder');
+var vendor = LabelledLineEdit(groupbox4_1, layout4_1, 0, 'Vendor', 40, 'Vendor folder inside the Morphs folder');
 vendor.text = App.getCurrentAuthor().name;
 
 //==================
@@ -994,7 +994,6 @@ var morph3Name = LabelledLineEdit(groupbox6_1, layout6_1, 2, 'CTRL Name', 60, 'M
 // Display 'Find Morph(s)' button
 //==================
 var groupbox6_2 = new DzVGroupBox(tab6);
-var layout6_2 = new DzGridLayout(groupbox6_2);
 
 var button_find = new DzPushButton(groupbox6_2); button_find.text = 'Find Morph(s)';
 connect(button_find, 'clicked()', function() { FindMorphs(); });
@@ -1025,9 +1024,10 @@ function FindMorphs()
 	if (names.length <= 0)
 		return;
 
-	// Get all figures (Base & Head components)
-	GetFigures();
-	figures.unshift(oNode);
+	// Get all figures
+	GetFigures(); // Head components
+	figures.unshift(oNode); // Base
+	morph_items = [];
 
 	// Search morph names in every figures
 	for (var n = 0; n < figures.length; n++)
@@ -1062,7 +1062,6 @@ function FindMorphs()
 // Display 'Delete Morph(s)' button
 //==================
 var groupbox6_3 = new DzVGroupBox(tab6);
-var layout6_3 = new DzGridLayout(groupbox6_3);
 groupbox6_3.hide();
 
 var button_delete = new DzPushButton(groupbox6_3); button_delete.text = 'Delete Morph(s)'; button_delete.toolTip = 'Delete Selected morph(s)';
@@ -1075,14 +1074,14 @@ function DeleteMorphs()
 	for (var i = 0; i < morph_items.length; i++)
 	{
 		var item_data = morph_items[i];
-		var item = item_data[0];
+		var item = item_data[0]; // DzCheckListItem
 
 		// Skip unchecked item
 		if (!item.on)
 			continue;
 
 		// Delete dsf file
-		var uri = item.text(2);
+		var uri = item.text(2); // Path
 		var success = true;
 
 		if (!uri.isEmpty())
