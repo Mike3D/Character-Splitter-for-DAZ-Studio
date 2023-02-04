@@ -277,7 +277,7 @@ function ERCFreeze(prop, name, node)
 		if (Math.abs(p.getValue()) < 0.001 || junk.indexOf(p.getLabel()) >= 0) // Discard insignificant values & junk properties
 			continue;
 
-		newProps.push(prop);
+		newProps.push(p);
 	}
 	freezer.setPropertiesToFreeze(newProps);
 
