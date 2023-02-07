@@ -26,7 +26,7 @@ var figures = []; // Head components
 var delView; // DzListView
 var morph_items = [];
 
-var imgFilter =  'Image Files (*.dsi *.jpg *.jpeg *.png *.cin *.dds *.dpx *.fits *.hdr *.rgbe *.ico *.iff *.z *.exr *.sxr *.mxr *.ppm *.pgm *.pbm *.pnm *.pfm *.psd *.pdd *.psb *.rla *.sgi *.rgb *.rgba *.bw *.int *.inta *.socket *.pic *.zfile *.tif *.tiff *.tdl *.bmp *.tga *.ptx); DAZ Studio Layered Image (*.dsi); JPEG File (*.jpg *.jpeg); PNG File (*.png); OIIO Files (*.cin *.dds *.dpx *.fits *.hdr *.rgbe *.ico *.iff *.z *.exr *.sxr *.mxr *.ppm *.pgm *.pbm *.pnm *.pfm *.psd *.pdd *.psb *.rla *.sgi *.rgb *.rgba *.bw *.int *.inta *.socket *.pic *.zfile); TIFF Files (*.tif *.tiff *.tdl); BMP file (*.bmp); TGA File (*.tga); PTex Files (*.ptx)';
+var imgFilter = 'Image Files (*.dsi *.jpg *.jpeg *.png *.cin *.dds *.dpx *.fits *.hdr *.rgbe *.ico *.iff *.z *.exr *.sxr *.mxr *.ppm *.pgm *.pbm *.pnm *.pfm *.psd *.pdd *.psb *.rla *.sgi *.rgb *.rgba *.bw *.int *.inta *.socket *.pic *.zfile *.tif *.tiff *.tdl *.bmp *.tga *.ptx); DAZ Studio Layered Image (*.dsi); JPEG File (*.jpg *.jpeg); PNG File (*.png); OIIO Files (*.cin *.dds *.dpx *.fits *.hdr *.rgbe *.ico *.iff *.z *.exr *.sxr *.mxr *.ppm *.pgm *.pbm *.pnm *.pfm *.psd *.pdd *.psb *.rla *.sgi *.rgb *.rgba *.bw *.int *.inta *.socket *.pic *.zfile); TIFF Files (*.tif *.tiff *.tdl); BMP file (*.bmp); TGA File (*.tga); PTex Files (*.ptx)';
 
 var helper = new DzSceneHelper();
 
@@ -89,7 +89,7 @@ function SetRefVert()
 //=========================
 function CopyCards()
 {
-	var cards = [selectedCard.text, selectedCard2.text, selectedCard3.text];
+	var cards = [selectedCard.toolTip, selectedCard2.toolTip, selectedCard3.toolTip];
 	var names = [morphName.text, morphName2.text, ctrl_name.text];
 
 	// Copy image files to product folder
@@ -151,7 +151,7 @@ function GetProductDir(node)
 function GetCardExt(name)
 {
 	var names = [morphName.text, morphName2.text, ctrl_name.text];
-	var cards = [selectedCard.text, selectedCard2.text, selectedCard3.text];
+	var cards = [selectedCard.toolTip, selectedCard2.toolTip, selectedCard3.toolTip];
 	var idx = names.indexOf(name);
 	return idx >= 0 && !cards[idx].isEmpty() ? cards[idx].split('.').pop() : 'png';
 }
@@ -408,7 +408,7 @@ function CreateMorph(node, deltas, mLabel, mName, mPath)
 		return;
 	}
 
-	var prop = helper.findControlProperty(mName, node, true, true); // Get morph object (DzProperty)
+	var prop = mod.getValueChannel(); // DzFloatProperty
 
 	if (prop != null)
 	{
@@ -417,7 +417,7 @@ function CreateMorph(node, deltas, mLabel, mName, mPath)
 		prop.setIsClamped(true); // Use Limits
 		prop.setCanAutoFollow(true);
 		prop.setMinMax(0, 1);
-		var card = mLabel === morphLabel.text ? selectedCard.text : selectedCard2.text;
+		var card = mLabel === morphLabel.text ? selectedCard.toolTip : selectedCard2.toolTip;
 		var present = SetPresentation(node, prop, mName);
 		morphs.push(prop); // Store morph (waiting for batch post-processing)
 		logBox.insertItem('✔ %1  |  Created (%2 deltas)'.arg(node.isRootNode() ? mName : node.name).arg(deltas.getNumDeltas()));
@@ -757,16 +757,31 @@ function PathCombo(parent, layout, row, txt, width, sel)
 	return box;
 }
 
-function CardSelect(parent, placeHolder, tip)
+function CardSelect(parent)
 {
-	var le = new DzLineEdit(parent);
-	le.readOnly = true;
-	le.placeholderText = placeHolder;
-	le.toolTip = tip;
-	var btn = new DzPushButton(parent);
+	var gbox = new DzGroupBox(parent);
+	gbox.title = 'Card Image';
+	gbox.toolTip = 'Optional : browse to your image file. Can be located anywhere, in any supported format. If left empty, links are created anyway and you can later drop PNG image files in your Product folder'
+
+	var btn = new DzPushButton(gbox);
 	btn.text = '...';
-	connect(btn, 'clicked()', function() { on_selectCardBtn_click(le); });
-	return le;
+	btn.maxWidth = 91;
+	btn.minHeight = 91;
+	btn.autoDefault = false;
+	btn.sizedFromIcon = true;
+	connect(btn, 'clicked()', function() { on_selectCardBtn_click(btn); });
+	return btn;
+}
+
+function on_selectCardBtn_click(btn)
+{
+	// Open directory browser
+	var file = FileDialog.doImageDialog(true); // String
+	if (file.isEmpty()) return; // Cancelled by user
+
+	// Display thumbnail & store selected file path in tooltip
+	btn.pixmap = App.getImageMgr().getImage(file).getPreviewPixmap(91, 91);
+	btn.toolTip = file;
 }
 
 //==================
@@ -837,18 +852,7 @@ var morph_path = PathCombo(groupbox1_1, layout1_1, 2, 'Path', 35, ['Actor', 'Hea
 //==================
 // Display 'Card Image' button for file browser / file path line edit
 //==================
-var groupbox1_2 = new DzHGroupBox(tab1); groupbox1_2.title = 'Card Image';
-var selectedCard = CardSelect(groupbox1_2, 'Optional : browse to your image file', 'Can be located anywhere. If left empty, links are created anyway and you can later drop PNG image files in your Product folder');
-
-// Open directory browser & store selected path
-function on_selectCardBtn_click(dest)
-{
-	// Open directory browser
-	var sFile = FileDialog.doImageDialog(true);
-	if (sFile.isEmpty()) return; // Cancelled by user
-
-	dest.text = sFile; // Store selected file path
-}
+var selectedCard = CardSelect(tab1);
 
 //==================================  Tab #2 'Morph #2'  =================================
 
@@ -882,8 +886,7 @@ SetRefVert(); // Set Reference Vertex based on figure name
 //==================
 // Display 'Card Image 2' button for file browser / file path line edit
 //==================
-var groupbox2_2 = new DzHGroupBox(tab2); groupbox2_2.title = 'Card Image';
-var selectedCard2 = CardSelect(groupbox2_2, 'Optional : browse to your image file', 'Can be located anywhere. If left empty, links are created anyway and you can later drop PNG image files in your product folder');
+var selectedCard2 = CardSelect(tab2);
 
 //==================================  Tab #3 'Controller'  =================================
 
@@ -914,8 +917,7 @@ var scale = Slider(groupbox3_1, layout3_1, 3, 'Scale', 40, 1, 0.01, true, true, 
 //==================
 // Display 'Controller Card Image' button for file browser / file path line edit
 //==================
-var groupbox3_2 = new DzHGroupBox(tab3); groupbox3_2.title = 'Card Image';
-var selectedCard3 = CardSelect(groupbox3_2, 'Optional : browse to your image file', 'Can be located anywhere. If left empty, links are created anyway and you can later drop PNG image files in your Product folder');
+var selectedCard3 = CardSelect(tab3);
 
 //==================================  Tab #4 'Settings'  =================================
 
