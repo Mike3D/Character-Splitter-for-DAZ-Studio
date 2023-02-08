@@ -45,7 +45,7 @@ function GetMorphsPaths()
 		var mod = obj.getModifier(i); // DzModifier
 		if (mod.inherits('DzMorph'))
 		{
-			var morph = mod.getValueChannel(); // DzProperty
+			var morph = mod.getValueChannel(); // DzFloatProperty
 			if (!morph.isHidden()) // Skip hidden morphs
 				out.pushIfNotExists(morph.getPath());
 		}
@@ -103,7 +103,7 @@ function CopyCards()
 		var prop = helper.findControlProperty(name, oNode, true, true);
 		var icon = prop.getPresentation().iconLarge;
 		var success = file.copy('%1/%2'.arg(App.getDataFolderPathBase()).arg(icon));
-		logBox.insertItem(success ? '✔ Card Image %1 copied'.arg(name) : '☠ Failed to copy Card Image %1'.arg(name));
+		logBox.insertItem(success ? '\u2714 Card Image %1 copied'.arg(name) : '\u2620 Failed to copy Card Image %1'.arg(name));
 	}
 }
 
@@ -197,11 +197,11 @@ function CreateCTRL()
 	var error = oNode.addProperty(prop);
 	if (error.valueOf() !== 0x00000000)
 	{
-		logBox.insertItem('☠ %1  |  Error while adding controller to node : %2'.arg(name).arg(getErrorMessage(error)));
+		logBox.insertItem('\u2620 %1  |  Error while adding controller to node : %2'.arg(name).arg(getErrorMessage(error)));
 		return;
 	}
 
-	logBox.insertItem('✔ %1  |  Created (controller)'.arg(name));
+	logBox.insertItem('\u2714 %1  |  Created (controller)'.arg(name));
 
 	// Dial-in the Head & Body morphs
 	for (var i = 0; i < 2; i++) // Iterate morphs (DzProperty)
@@ -246,7 +246,7 @@ function AdjustRiggingToShape(name, node)
 	beginUndo(); // Begin undo hold
 		var success = adjuster.doAdjustments();
 		var label = node.isRootNode() ? name : node.getLabel();
-		logBox.insertItem(success ? '✔ %1  |  Rigging adjusted to shape'.arg(label) : '☠ %1  |  Failed to adjust rigging to shape'.arg(label));
+		logBox.insertItem(success ? '\u2714 %1  |  Rigging adjusted to shape'.arg(label) : '\u2620 %1  |  Failed to adjust rigging to shape'.arg(label));
 	acceptUndo('Adjust Rigging To Shape - %1'.arg(name)); // Finish undo hold
 }
 
@@ -293,7 +293,7 @@ function ERCFreeze(prop, name, node)
 	beginUndo(); // Begin undo hold
 		var success = freezer.doFreeze();
 		var label = node.isRootNode() ? name : node.getLabel();
-		logBox.insertItem(success ? '✔ %1  |  ERC freezed'.arg(label) : '☠ %1  |  ERC freeze failure'.arg(label));
+		logBox.insertItem(success ? '\u2714 %1  |  ERC freezed'.arg(label) : '\u2620 %1  |  ERC freeze failure'.arg(label));
 	acceptUndo('ERC Freeze - %1'.arg(name)); // Finish undo hold
 }
 
@@ -321,7 +321,7 @@ function WriteMorph(node, mName)
 	// Use the asset manager to save to file, using the filter and defined settings
 	var error = assetMgr.doSaveWithOptions(filter, settings);
 	var label = node.isRootNode() ? mName : node.getLabel();
-	logBox.insertItem(error.valueOf() === 0x00000000 ? '✔ %1  |  Saved to file'.arg(label) : '☠ %1  |  Error while writing to %2 : %3'.arg(label).arg(path).arg(getErrorMessage(error)));
+	logBox.insertItem(error.valueOf() === 0x00000000 ? '\u2714 %1  |  Saved to file'.arg(label) : '\u2620 %1  |  Error while writing to %2 : %3'.arg(label).arg(path).arg(getErrorMessage(error)));
 	filter.deleteLater();
 }
 
@@ -404,7 +404,7 @@ function CreateMorph(node, deltas, mLabel, mName, mPath)
 	var error = node.getObject().addModifier(mod);
 	if (error.valueOf() !== 0x00000000)
 	{
-		logBox.insertItem('☠ %1  |  Error while adding morph to node : %2'.arg(mName).arg(getErrorMessage(error)));
+		logBox.insertItem('\u2620 %1  |  Error while adding morph to node : %2'.arg(mName).arg(getErrorMessage(error)));
 		return;
 	}
 
@@ -420,10 +420,10 @@ function CreateMorph(node, deltas, mLabel, mName, mPath)
 		var card = mLabel === morphLabel.text ? selectedCard.toolTip : selectedCard2.toolTip;
 		var present = SetPresentation(node, prop, mName);
 		morphs.push(prop); // Store morph (waiting for batch post-processing)
-		logBox.insertItem('✔ %1  |  Created (%2 deltas)'.arg(node.isRootNode() ? mName : node.name).arg(deltas.getNumDeltas()));
+		logBox.insertItem('\u2714 %1  |  Created (%2 deltas)'.arg(node.isRootNode() ? mName : node.name).arg(deltas.getNumDeltas()));
 	}
 	else
-		logBox.insertItem('☠ %1  |  Failed to create morph'.arg(mName));
+		logBox.insertItem('\u2620 %1  |  Failed to create morph'.arg(mName));
 }
 
 //=========================
@@ -463,7 +463,7 @@ function FindDFormer()
 		issue = 'No Modifier found';
 	else
 	{
-		logBox.insertItem('✔ Using DFormer %1'.arg(deformer.name));
+		logBox.insertItem('\u2714 Using DFormer %1'.arg(deformer.name));
 
 		// Get DFormer weights
 		weights = deformer.getModifier(0).getInfluenceWeights();
@@ -472,7 +472,7 @@ function FindDFormer()
 	}
 
 	if (!issue.isEmpty())
-		MessageBox.warning('\n%1   '.arg(issue), '☠DFormer Issue', 'OK', '');
+		MessageBox.warning('\n%1   '.arg(issue), '\u2620DFormer Issue', 'OK', '');
 }
 
 //=========================
@@ -482,7 +482,7 @@ function ErrorDialog(errors)
 {
 	// Create a dialog
 	var dlg = new DzDialog();
-	dlg.caption = '☠☠';
+	dlg.caption = '\u2620\u2620';
 	dlg.setFixedSize(160, 220);
 
 	var dlgGB = new DzVGroupBox(dlg);
@@ -801,7 +801,7 @@ var tab2 = new DzVGroupBox(tabs); tabs.addTab(tab2, 'Body'); tabs.setTabToolTip(
 var tab3 = new DzVGroupBox(tabs); tabs.addTab(tab3, 'CTRL'); tabs.setTabToolTip(2, 'Controller for Head + Body (used to apply full character)');
 var tab4 = new DzVGroupBox(tabs); tabs.addTab(tab4, 'Settings');
 var tab5 = new DzVGroupBox(tabs); tabs.addTab(tab5, 'Log');
-var tab6 = new DzVGroupBox(tabs); tabs.addTab(tab6, '☠');
+var tab6 = new DzVGroupBox(tabs); tabs.addTab(tab6, '\u2620');
 
 //==================================  Tab #1 'Morph #1'  =================================
 
@@ -1116,10 +1116,10 @@ function DeleteMorphs()
 				morph.name = randName;
 			prop.setLabel(randName);
 
-			logBox.insertItem('✔ Deleted %1'.arg(uri));
+			logBox.insertItem('\u2714 Deleted %1'.arg(uri));
 		}
 		else
-			logBox.insertItem('☠ Failed to delete %1'.arg(uri));
+			logBox.insertItem('\u2620 Failed to delete %1'.arg(uri));
 	}
 
 	logBox.insertItem('==========================================');
