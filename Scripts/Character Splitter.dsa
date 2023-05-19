@@ -76,7 +76,7 @@ function SetRefVert()
 {
 	var n = oNode.name;
 	var v = '';
-	if (n === 'Genesis') r = '3222';
+	if (n === 'Genesis') v = '3222';
 	else if (n.lastIndexOf('Genesis2') === 0) v = '10912';
 	else if (n.lastIndexOf('Genesis3F') === 0 || n.lastIndexOf('Genesis8F') === 0) v = '3127';
 	else if (n.lastIndexOf('Genesis3M') === 0 || n.lastIndexOf('Genesis8M') === 0) v = '2926';
