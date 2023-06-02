@@ -1,5 +1,7 @@
 # Character Splitter for DAZ Studio
 
+![wysiwyg jpg](User_Manual/Promo.jpg)
+
 ### Tool for splitting a character shape between head & body
 
 * Create separate head & body morphs from a full character
