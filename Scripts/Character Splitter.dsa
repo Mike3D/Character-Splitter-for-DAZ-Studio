@@ -265,8 +265,8 @@ function ERCFreeze(prop, name, node)
 	for (var i = 0; i < nodes.length; i++) // Iterate over the nodes
 		freezer.addPropertiesToFreeze(nodes[i]); // Add the node's properties
 
-	// Remove junk properties
-	var junk = ['Bone Edge Opacity', 'Bone Fill Opacity', 'DForm', 'Eyelashes Length Upper', 'Eyelashes Length Lower', 'Eyelashes Curl'];
+	// Remove junk properties and discard insignificant values (below 0.001 threshold)
+	var junk = []; // No longer used, but left in case someone needs it
 	var props = freezer.getPropertiesToFreeze();
 	var newProps = [];
 
@@ -641,8 +641,8 @@ function Execute()
 
 		var node = morph.getElementParent().getElementParent(); // Morph node (morph < object < node)
 
-		// Zero figure
-		trigger_action('DzZeroFigureAction');
+		// Restore figure
+		trigger_action('DzRestoreFigureAction');
 
 		// Dial morph in
 		if (node.isRootNode()) // Head/Body morph - Note: Head parts (morph & skel) are driven by Head morph
@@ -671,7 +671,7 @@ function Execute()
 	if (doSplit.checked && ctrl.checked)
 		CreateCTRL(); // Create controller
 
-	trigger_action('DzZeroFigureAction'); // Zero figure
+	trigger_action('DzRestoreFigureAction'); // Restore figure
 
 	CopyCards();
 
@@ -787,21 +787,34 @@ function on_selectCardBtn_click(btn)
 //==================
 // Window
 //==================
-var window = new DzDialog(); window.caption = 'Character Splitter';
-window.minWidth = 310;
+var window = new DzDialog(); window.caption = 'Character Splitter V2';
+window.minWidth = 345;
 var layout = new DzBoxLayout(window);
 
 //==================
-// Display 6 tabs
+// Display 7 tabs
 //==================
 var tabs = new DzTabWidget(window);
 layout.addWidget(tabs, 0, 0);
-var tab1 = new DzVGroupBox(tabs); tabs.addTab(tab1, 'Head'); tabs.setTabToolTip(0, 'DFormer = 100% (Head)');
-var tab2 = new DzVGroupBox(tabs); tabs.addTab(tab2, 'Body'); tabs.setTabToolTip(1, 'DFormer = 0% (Body)');
-var tab3 = new DzVGroupBox(tabs); tabs.addTab(tab3, 'CTRL'); tabs.setTabToolTip(2, 'Controller for Head + Body (used to apply full character)');
+var tab0 = new DzVGroupBox(tabs); tabs.addTab(tab0, '\u2665');
+var tab1 = new DzVGroupBox(tabs); tabs.addTab(tab1, 'Head'); tabs.setTabToolTip(1, 'DFormer = 100% (Head)');
+var tab2 = new DzVGroupBox(tabs); tabs.addTab(tab2, 'Body'); tabs.setTabToolTip(2, 'DFormer = 0% (Body)');
+var tab3 = new DzVGroupBox(tabs); tabs.addTab(tab3, 'CTRL'); tabs.setTabToolTip(3, 'Controller for Head + Body (used to apply full character)');
 var tab4 = new DzVGroupBox(tabs); tabs.addTab(tab4, 'Settings');
 var tab5 = new DzVGroupBox(tabs); tabs.addTab(tab5, 'Log');
 var tab6 = new DzVGroupBox(tabs); tabs.addTab(tab6, '\u2620');
+
+//==================================  Tab #0 'Welcome'  =================================
+
+var scriptPath = new DzFileInfo(getScriptFileName()).path();
+
+var gitbtn = new DzPushButton(tab0);
+var giturl = 'https://github.com/Mike3D/Character-Splitter-for-DAZ-Studio';
+gitbtn.toolTip = giturl;
+gitbtn.pixmap = new Pixmap(scriptPath + '/Character_Splitter_Promo.jpg');
+gitbtn.sizedFromIcon = true;
+connect(gitbtn, 'clicked()', function() { App.showURL(giturl); });
+
 
 //==================================  Tab #1 'Morph #1'  =================================
 
@@ -926,14 +939,14 @@ var selectedCard3 = CardSelect(tab3);
 //==================
 var doSplit = CheckBox(tab4, 'Split Shape Using a DFormer', 'Whether to use a DFormer to split the current shape. Note that the DFormer must be applied before processing');
 doSplit.checked = true;
-connect(doSplit, 'clicked()', function() { tabs.setTabEnabled(1, doSplit.checked); tabs.setTabEnabled(2, doSplit.checked && ctrl.checked); doSplit.checked ? ctrl.show() : ctrl.hide(); });
+connect(doSplit, 'clicked()', function() { tabs.setTabEnabled(2, doSplit.checked); tabs.setTabEnabled(3, doSplit.checked && ctrl.checked); doSplit.checked ? ctrl.show() : ctrl.hide(); });
 
 //==================
 // Display 'Create Controller' checkbox
 //==================
 var ctrl = CheckBox(tab4, 'Create Controller', 'Whether to create a controller to drive both morphs');
 ctrl.checked = true;
-connect(ctrl, 'clicked()', function() { tabs.setTabEnabled(2, ctrl.checked && doSplit.checked); });
+connect(ctrl, 'clicked()', function() { tabs.setTabEnabled(3, ctrl.checked && doSplit.checked); });
 
 //==================
 // Display 'Normalize Figure' checkbox
