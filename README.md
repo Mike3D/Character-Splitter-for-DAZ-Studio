@@ -1,6 +1,6 @@
 # Character Splitter for DAZ Studio
 
-![wysiwyg jpg](User_Manual/Promo.jpg)
+![promo jpg](Scripts/Character_Splitter_Promo.jpg)
 
 ### Tool for splitting a character shape between head & body
 
