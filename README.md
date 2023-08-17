@@ -58,7 +58,7 @@ The first 4 tabs of the GUI allow to tailor everything to suit your needs, allow
 
 ## Usage
 
-Please refer to the User Manual in the eponymous folder.
+Please refer to the [User Manual](User_Manual/User%20Manual.pdf).
 
 ## Miscellaneous
 
