@@ -1,4 +1,99 @@
+/*
+	Notes for updating to Genesis 10 and above:
+	- set new reference vertex in SetRefVert()
+	- ensure that first neck bone contains 'neck' in its name (otherwise update GetBonesToExclude(step))
+*/
+
 try { (function() {
+
+//=========================================  User Config Validation (Plugins)  =========================================
+
+//=========================
+// On startup, ensure that all mandatory plugins are there & ready to use
+//=========================
+function CheckPlugins()
+{
+	var errors = [];
+
+	var mgr = App.getPluginMgr(); // Get the plugin manager (DzPluginMgr)
+
+	var plugins = ['Asset Save Filters', 'Customize Interface', 'Default Save Filters', 'Joint Editor Tool', 'Property Hierarchy Pane']; // Mandatory plugins
+	for (var i = 0; i < plugins.length; i++)
+	{
+		var name = plugins[i];
+		var p = mgr.findPlugin(name);
+
+		// Missing plugin
+		if (p == null)
+			errors.push([name, 'Missing']);
+
+		// Plugin not loaded
+		else if (p.getStatus() !== 0) // Status 0 = Loaded
+			errors.push([name, p.getStatusString()]);
+	}
+
+	// Spawn error dialog
+	if (errors.length > 0)
+	{
+		ErrorDialog(errors, 'Mandatory Plugins Issues', ['Plugin', 'Issue']);
+		return true;
+	}
+	return false;
+}
+
+//=========================
+// Spawn error dialog when there are some mandatory plugins issues or when setup is incomplete (missing fields)
+//=========================
+function ErrorDialog(errors, title, items)
+{
+	// Create a dialog
+	var dlg = new DzDialog();
+	dlg.caption = '\u2620\u2620';
+	dlg.minWidth = 195; dlg.minHeight = 215;
+
+	var dlgGB = new DzVGroupBox(dlg);
+
+	if (errors.length > 0)
+	{
+		var gbox = new DzVGroupBox(dlgGB); gbox.title = title;
+
+		var errorsLV = new DzListView(gbox);
+
+		for (var i = 0; i < items.length; i++)
+		{
+			errorsLV.addColumn(items[i]);
+			errorsLV.setColumnWidthMode(i, 0);
+		}
+		errorsLV.setColumnWidth(0, 130);
+		errorsLV.setColumnWidth(1, 45);
+		errorsLV.setColumnWidthMode(0, 1); // Expand column #1 automatically
+		errorsLV.setColumnWidthMode(1, 1); // Expand column #2 automatically
+		errorsLV.allColumnsShowFocus = true;
+		errorsLV.sortColumn = 1;
+
+		for (var i = 0; i < errors.length; i++)
+		{
+			var e = errors[i]; // [field ; tab]
+
+			errors[i] = new DzListViewItem(errorsLV, i);
+			errors[i].setText(0, e[0]);
+			errors[i].setText(1, e[1]);
+		}
+	}
+
+	// Spawn the dialog & wait
+	processEvents();
+	dlg.exec();
+}
+
+// Perform th check. On issues, report errors & display the 'About Installed Plugins' dialog on exit
+if (CheckPlugins())
+{
+	App.getPluginMgr().doAboutPluginsDlg();
+	return;
+}
+
+//=========================================  User config OK, let's go  =========================================
 
 // Get the root of a node (DzNode)
 function getRootNode(oNode)
@@ -95,11 +190,11 @@ function CopyCards()
 	// Copy image files to product folder
 	for (var i = 0; i < cards.length; i++)
 	{
-		var src = cards[i];
-		if (src.isEmpty())
+		var card = cards[i];
+		if (card.isEmpty())
 			continue;
+		var file = new DzFile(card);
 		var name = names[i];
-		var file = new DzFile(src);
 		var prop = helper.findControlProperty(name, oNode, true, true);
 		var icon = prop.getPresentation().iconLarge;
 		var success = file.copy('%1/%2'.arg(App.getDataFolderPathBase()).arg(icon));
@@ -231,13 +326,65 @@ function CreateCTRL()
 }
 
 //=========================
+// Return array of bone names to exclude from Rigging To Shape (body bones for head morphs & head bones for body morph)
+// "step" parameter is the morph creation step (0 for body, 1 and beyond for head)
+//=========================
+function GetBonesToExclude(step)
+{
+	var bones = oNode.getNodeChildren(true);
+	var bnames = [];
+	var neck;
+
+	// Find Neck bone (named differently for each generation, split starting from G3, always containing 'neck', so we search the first bone name containing 'neck')
+	for (var i = 0; i < bones.length; i++)
+	{
+		var n = bones[i].name; // Bone name
+
+		// Exit when neck is found
+		if (n.indexOf("neck") >= 0)
+		{
+			neck = bones[i];
+			if (step === 0)
+				break;
+		}
+
+		if (step > 0)
+			bnames.push(n);
+	}
+
+	// Neck bone not found, return empty array
+	if (neck == null)
+		return [];
+
+	// Get head bones
+	var children = neck.getNodeChildren(true);
+	var headNames = [neck.name]; // Head + Neck bone names
+
+	for (var i = 0; i < children.length; i++) // Iterate neck children
+		headNames.push(children[i].name); // Store node name
+
+	// Get bones to exclude
+	var toExclude = [];
+
+	if (step === 0) // Body morph => exclude head bones (including neck)
+		toExclude = headNames;
+
+	else // Head morphs => exclude body bones
+		toExclude = bnames.filter(function(n) { return headNames.indexOf(n) < 0; });
+
+	return toExclude;
+}
+
+//=========================
 // Adjust rigging to shape (silently)
 //=========================
-function AdjustRiggingToShape(name, node)
+function AdjustRiggingToShape(name, node, step)
 {
 	// Create & set
 	var adjuster = new DzShapeRiggingAdjuster();
 	adjuster.setFigure(node);
+	if (step >= 0)
+		adjuster.setExcludedBones(GetBonesToExclude(step));
 	adjuster.setAdjustCenterPoints(true);
 	adjuster.setAdjustEndPoints(true);
 	adjuster.setAdjustOrientation(false);
@@ -330,7 +477,7 @@ function WriteMorph(node, mName)
 //=========================
 function CreateOtherDeltas(node)
 {
-	// Refresh scaled geometry in 'normalize' mode
+	// Refresh scaled geometry in 'normalized' mode
 	if (normalize.checked)
 		node.update();
 
@@ -368,7 +515,7 @@ function CreateDeltas(invert)
 		var v1 = src.getVertex(i); // Base vertex
 		var v2 = tgt.getVertex(i); // Morphed & transformed vertex
 
-		if (weights) // DFormer weight for this vertex
+		if (weights) // D-Former weight for this vertex
 		{
 			var wgt = weights.getFloatWeight(i);
 
@@ -382,9 +529,9 @@ function CreateDeltas(invert)
 		if (doSplit.checked && !normalize.checked)
 			v2.y -= offset;
 
-		// Apply DFormer weight to delta => weighted delta
+		// Apply D-Former weight to delta => weighted delta
 		var delta = v2.subtract(v1);
-		if (weights) // Apply DFormer weights to delta
+		if (weights) // Apply D-Former weights to delta
 			delta = delta.multiply(new DzVec3(wgt, wgt, wgt));
 
 		deltas.addDelta(i, delta);
@@ -441,13 +588,13 @@ function CreateDeltasMorph(node, invert, mLabel, mName, mPath)
 //=========================================  Setup Validation  =========================================
 
 //=========================
-// Find DFormer, get weights and report issues
+// Find D-Former, get weights and report issues
 //=========================
 function FindDFormer()
 {
 	var issue = '';
 
-	// Get DFormer
+	// Get D-Former
 	var deformer; // DzDForm
 	var nodes = oNode.getNodeChildren(true);
 	for (var i = 0; i < nodes.length; i++) // Iterate object nodes
@@ -458,65 +605,27 @@ function FindDFormer()
 	}
 
 	if (!deformer)
-		issue = 'No DFormer found';
+		issue = 'No D-Former found';
 	else if (deformer.getNumModifiers() === 0)
-		issue = 'No Modifier found';
+		issue = 'No Modifier found for D-Former';
 	else
 	{
-		logBox.insertItem('\u2714 Using DFormer %1'.arg(deformer.name));
+		logBox.insertItem('\u2714 Using D-Former %1'.arg(deformer.name));
 
-		// Get DFormer weights
+		// Get D-Former weights
 		weights = deformer.getModifier(0).getInfluenceWeights();
 		if (!weights)
-			issue = 'Cannot proceed : DFormer has no weights';
+			issue = 'D-Former has no weights';
+
+		// Check matching number of vertices with base figure
+		var numWeights = weights.getNumWeights();
+		var numVerts = oNode.getObject().getCurrentShape().getGeometry().getNumVertices();
+		if (numWeights !== numVerts)
+			issue = "D-Former vertices (%1) don't match base figure (%2)".arg(numWeights).arg(numVerts);
 	}
 
 	if (!issue.isEmpty())
-		MessageBox.warning('\n%1   '.arg(issue), '\u2620DFormer Issue', 'OK', '');
-}
-
-//=========================
-// Spawn error dialog when setup is incomplete (missing fields)
-//=========================
-function ErrorDialog(errors)
-{
-	// Create a dialog
-	var dlg = new DzDialog();
-	dlg.caption = '\u2620\u2620';
-	dlg.setFixedSize(160, 220);
-
-	var dlgGB = new DzVGroupBox(dlg);
-
-	if (errors.length > 0)
-	{
-		var gbox = new DzVGroupBox(dlgGB); gbox.title = 'Mandatory Fields Left Empty';
-
-		var errorsLV = new DzListView(gbox);
-
-		var items = ['Field', 'Tab'];
-		for (var i = 0; i < items.length; i++)
-		{
-			errorsLV.addColumn(items[i]);
-			errorsLV.setColumnWidthMode(i, 0);
-		}
-		errorsLV.setColumnWidth(0, 100);
-		errorsLV.setColumnWidth(1, 45);
-		errorsLV.allColumnsShowFocus = true;
-		errorsLV.sortColumn = 1;
-
-		for (var i = 0; i < errors.length; i++)
-		{
-			var e = errors[i]; // [field ; tab]
-
-			errors[i] = new DzListViewItem(errorsLV, i);
-			errors[i].setText(0, e[0]);
-			errors[i].setText(1, e[1]);
-		}
-	}
-
-	// Spawn the dialog & wait
-	processEvents();
-	dlg.exec();
+		MessageBox.warning('\n%1   '.arg(issue), '\u2620D-Former Issue', 'OK', '');
 }
 
 //=========================
@@ -563,7 +672,7 @@ function ValidateSetup()
 	// Spawn error dialog
 	if (errors.length > 0)
 	{
-		ErrorDialog(errors);
+		ErrorDialog(errors, 'Mandatory Fields Left Empty', ['Field', 'Tab']);
 		return;
 	}
 
@@ -658,7 +767,7 @@ function Execute()
 			}
 
 			// Adjust rigging to shape
-			AdjustRiggingToShape(morph.name, node);
+			AdjustRiggingToShape(morph.name, node, doSplit.checked ? i : -1);
 
 			// ERC Freeze
 			ERCFreeze(prop, morph.name, node);
@@ -787,7 +896,7 @@ function on_selectCardBtn_click(btn)
 //==================
 // Window
 //==================
-var window = new DzDialog(); window.caption = 'Character Splitter V2';
+var window = new DzDialog(); window.caption = 'Character Splitter V3';
 window.minWidth = 345;
 var layout = new DzBoxLayout(window);
 
@@ -797,8 +906,8 @@ var layout = new DzBoxLayout(window);
 var tabs = new DzTabWidget(window);
 layout.addWidget(tabs, 0, 0);
 var tab0 = new DzVGroupBox(tabs); tabs.addTab(tab0, '\u2665');
-var tab1 = new DzVGroupBox(tabs); tabs.addTab(tab1, 'Head'); tabs.setTabToolTip(1, 'DFormer = 100% (Head)');
-var tab2 = new DzVGroupBox(tabs); tabs.addTab(tab2, 'Body'); tabs.setTabToolTip(2, 'DFormer = 0% (Body)');
+var tab1 = new DzVGroupBox(tabs); tabs.addTab(tab1, 'Head'); tabs.setTabToolTip(1, 'Head when splitting, Full figure otherwise');
+var tab2 = new DzVGroupBox(tabs); tabs.addTab(tab2, 'Body'); tabs.setTabToolTip(2, 'Body when splitting, Disabled otherwise');
 var tab3 = new DzVGroupBox(tabs); tabs.addTab(tab3, 'CTRL'); tabs.setTabToolTip(3, 'Controller for Head + Body (used to apply full character)');
 var tab4 = new DzVGroupBox(tabs); tabs.addTab(tab4, 'Settings');
 var tab5 = new DzVGroupBox(tabs); tabs.addTab(tab5, 'Log');
@@ -891,7 +1000,7 @@ var morph_path2 = PathCombo(groupbox2_1, layout2_1, 2, 'Path', 35, ['Actor', 'Fu
 //==================
 // Display 'Reference Vertex' line edit
 //==================
-var refVertex = LabelledLineEdit(groupbox2_1, layout2_1, 3, 'Vertex', 35, 'Reference Vertex for DFormer');
+var refVertex = LabelledLineEdit(groupbox2_1, layout2_1, 3, 'Vertex', 35, 'Reference Vertex for D-Former');
 refVertex.toolTip = 'For Head Split : G9 = 5442 | G8F~G3F = 3127 | G8M~G3M = 2926 | G2 = 10912 | G1 = 3222';
 refVertex.setIntValidator(0, Infinity); // Note: we can't use tgt.getNumVertices() - 1 for upper limit as we may start with a subdivided mesh (or not)
 SetRefVert(); // Set Reference Vertex based on figure name
@@ -937,7 +1046,7 @@ var selectedCard3 = CardSelect(tab3);
 //==================
 // Display 'Split Morph' checkbox
 //==================
-var doSplit = CheckBox(tab4, 'Split Shape Using a DFormer', 'Whether to use a DFormer to split the current shape. Note that the DFormer must be applied before processing');
+var doSplit = CheckBox(tab4, 'Split Shape Using a D-Former', 'Whether to use a D-Former to split the current shape. Note that the D-Former must be applied before processing');
 doSplit.checked = true;
 connect(doSplit, 'clicked()', function() { tabs.setTabEnabled(2, doSplit.checked); tabs.setTabEnabled(3, doSplit.checked && ctrl.checked); doSplit.checked ? ctrl.show() : ctrl.hide(); });
 
@@ -952,6 +1061,7 @@ connect(ctrl, 'clicked()', function() { tabs.setTabEnabled(3, ctrl.checked && do
 // Display 'Normalize Figure' checkbox
 //==================
 var normalize = CheckBox(tab4, 'Normalize Figure', 'Whether to rescale morphs to match base figure proportions');
+normalize.checked = true;
 
 //==================
 // Display 'Vendor' line edit
@@ -991,7 +1101,7 @@ connect(button_save, 'clicked()', function() { ValidateSetup(); });
 var groupbox5 = new DzVGroupBox(tab5); groupbox5.title = 'Log Report';
 var logBox = new DzListBox(groupbox5);
 
-// Find DFormer and throw a warning if not found
+// Find D-Former and throw a warning on issue
 var deformerIssue = FindDFormer();
 
 //==================================  Tab #6 '☠'  =================================
@@ -1143,4 +1253,12 @@ function DeleteMorphs()
 
 //============================================= Run the script =============================================
 window.exec(); })(); }
-catch(err) { MessageBox.critical('Runtime Error: ' + err.message, 'Fatal Error', 'Exit'); }
+catch(err)
+{
+	// Ensure that MessageBox is available (requires 'Customize Interface' plugin)
+	if (typeof MessageBox === 'undefined')
+		print("[FATAL ERROR] To use Character Splitter the 'Customize Interface' plugin must be enabled");
+
+	// Note: if MessageBox is not available, call to MessageBox below triggers an error inviting the user to check his log
+	MessageBox.critical('Runtime Error: ' + err.message, 'Fatal Error', 'Exit');
+}
