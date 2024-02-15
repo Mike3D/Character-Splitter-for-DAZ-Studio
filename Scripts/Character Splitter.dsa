@@ -1,4 +1,9 @@
 /*
+	Todo:
+	- enable automatic Reference Vertex detection in FindDFormer(), already implemented
+	This requires decoupling Reference Vertex from exports done without using a D-Former
+	- investigate the best Reference Vertex : on the neck edge loop (slightly weighted) or just below (rigid)
+
 	Notes for updating to Genesis 10 and above:
 	- set new reference vertex in SetRefVert()
 	- ensure that first neck bone contains 'neck' in its name (otherwise update GetBonesToExclude(step))
@@ -173,8 +178,8 @@ function SetRefVert()
 	var v = '';
 	if (n === 'Genesis') v = '3222';
 	else if (n.lastIndexOf('Genesis2') === 0) v = '10912';
-	else if (n.lastIndexOf('Genesis3F') === 0 || n.lastIndexOf('Genesis8F') === 0) v = '3127';
-	else if (n.lastIndexOf('Genesis3M') === 0 || n.lastIndexOf('Genesis8M') === 0) v = '2926';
+	else if (n.lastIndexOf('Genesis3F') === 0 || n.lastIndexOf('Genesis8F') === 0 || n.lastIndexOf('Genesis8_1F') === 0) v = '3127';
+	else if (n.lastIndexOf('Genesis3M') === 0 || n.lastIndexOf('Genesis8M') === 0 || n.lastIndexOf('Genesis8_1M') === 0) v = '2926';
 	else if (n.lastIndexOf('Genesis9') === 0) v = '5442';
 	refVertex.text = v;
 }
@@ -618,10 +623,39 @@ function FindDFormer()
 			issue = 'D-Former has no weights';
 
 		// Check matching number of vertices with base figure
+		var geom = oNode.getObject().getCurrentShape().getGeometry();
 		var numWeights = weights.getNumWeights();
-		var numVerts = oNode.getObject().getCurrentShape().getGeometry().getNumVertices();
-		if (numWeights !== numVerts)
-			issue = "D-Former vertices (%1) don't match base figure (%2)".arg(numWeights).arg(numVerts);
+		var numVerts = geom.getNumVertices();
+		if (numWeights === numVerts)
+		{
+			// D-Former OK, get Reference Vertex
+			var lowestY = Number.MAX_VALUE;
+			var refVert = 0;
+
+			for (var i = 0; i < geom.getNumVertices(); i++) // Iterate vertices
+			{
+				var wgt = weights.getFloatWeight(i);
+
+				// Reference Vertex is neither on head (weight=1) nore on body (weight=0)
+				if (wgt === 0 || wgt === 1)
+					continue;
+
+				var v = geom.getVertex(i); // DzVec3
+
+				// Reference Vertex is on the central edge loop and on front
+				if (v.x === 0 && v.z > 0)
+				{
+					if (v.y < lowestY)
+					{
+						refVert = i;
+						lowestY = v.y;
+					}
+				}
+			}
+
+//			refVertex.text = refVert;
+		}
+		else issue = "D-Former vertices (%1) don't match base figure (%2)".arg(numWeights).arg(numVerts);
 	}
 
 	if (!issue.isEmpty())
@@ -729,7 +763,8 @@ function Execute()
 		else offset = rv2 - rv1; // 'WYSIWYG' mode
 	}
 
-	if (!doSplit.checked)	// Don't use weights if not splitting
+	// Don't use weights if not splitting
+	if (!doSplit.checked)
 		weights = null;
 
 	// Create morphs for base figure
@@ -925,7 +960,7 @@ gitbtn.sizedFromIcon = true;
 connect(gitbtn, 'clicked()', function() { App.showURL(giturl); });
 
 
-//==================================  Tab #1 'Morph #1'  =================================
+//==================================  Tab #1 'Head'  =================================
 
 //==================
 // Display 'Morph Name' line edit
@@ -976,7 +1011,7 @@ var morph_path = PathCombo(groupbox1_1, layout1_1, 2, 'Path', 35, ['Actor', 'Hea
 //==================
 var selectedCard = CardSelect(tab1);
 
-//==================================  Tab #2 'Morph #2'  =================================
+//==================================  Tab #2 'Body'  =================================
 
 //==================
 // Display 'Morph Name 2' line edit
