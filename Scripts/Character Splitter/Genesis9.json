@@ -1,0 +1,93 @@
+{
+	"PostLoadScriptPath" : "data/DAZ 3D/Genesis 9/Base/Tools/Utilities/Character Addon Loader.dse",
+	"PostLoadScriptSettings" : {
+		"PostLoadAddons" : {
+			"type" : "settings",
+			"value" : {
+				"Follower/Attachment/Head/Face/Eyelashes" : {
+					"type" : "settings",
+					"value" : {
+						"AssetName" : "Genesis9Eyelashes",
+						"AssetFile" : "data/DAZ 3D/Genesis 9/Genesis 9 Eyelashes/Tools/Script Loads/Genesis 9 Eyelashes.duf",
+						"Presets" : {
+							"type" : "settings",
+							"value" : {
+								"Mat" : {
+									"type" : "settings",
+									"value" : {
+										"PresetFile" : "data/DAZ 3D/Genesis 9/Genesis 9 Eyelashes/Tools/Script Loads/Genesis 9 Eyelashes MAT.duf",
+										"SelectAddon" : false
+									}
+								}
+							}
+						}
+					}
+				},
+				"Follower/Attachment/Head/Face/Tears" : {
+					"type" : "settings",
+					"value" : {
+						"AssetName" : "Genesis9Tear",
+						"AssetFile" : "data/DAZ 3D/Genesis 9/Genesis 9 Tear/Tools/Script Loads/Genesis 9 Tear.duf",
+						"Presets" : {
+							"type" : "settings",
+							"value" : {
+								"Mat" : {
+									"type" : "settings",
+									"value" : {
+										"PresetFile" : "data/DAZ 3D/Genesis 9/Genesis 9 Tear/Tools/Script Loads/Genesis 9 Tear MAT.duf",
+										"SelectAddon" : false
+									}
+								}
+							}
+						}
+					}
+				},
+				"Follower/Attachment/Head/Face/Eyes" : {
+					"type" : "settings",
+					"value" : {
+						"AssetName" : "Genesis9Eyes",
+						"AssetFile" : "data/DAZ 3D/Genesis 9/Genesis 9 Eyes/Tools/Script Loads/Genesis 9 Eyes.duf",
+						"Presets" : {
+							"type" : "settings",
+							"value" : {
+								"Mat" : {
+									"type" : "settings",
+									"value" : {
+										"PresetFile" : "data/DAZ 3D/Genesis 9/Genesis 9 Eyes/Tools/Script Loads/Genesis 9 Eyes MAT.duf",
+										"SelectAddon" : false
+									}
+								}
+							}
+						}
+					}
+				},
+				"Follower/Attachment/Head/Face/Mouth" : {
+					"type" : "settings",
+					"value" : {
+						"AssetName" : "Genesis9Mouth",
+						"AssetFile" : "data/DAZ 3D/Genesis 9/Genesis 9 Mouth/Tools/Script Loads/Genesis 9 Mouth.duf",
+						"Presets" : {
+							"type" : "settings",
+							"value" : {
+								"Mat" : {
+									"type" : "settings",
+									"value" : {
+										"PresetFile" : "data/DAZ 3D/Genesis 9/Genesis 9 Mouth/Tools/Script Loads/Genesis 9 Mouth MAT.duf",
+										"SelectAddon" : false
+									}
+								}
+							}
+						}
+					}
+				},
+				"Follower/Attachment/Head/Forehead/Eyebrows" : {
+					"type" : "settings",
+					"value" : {
+						"AssetName" : "G9EyebrowCards",
+						"AssetFile" : "data/DAZ 3D/Genesis 9/Base/Tools/Script Loads/Eyebrows/Card Eyebrows.duf"
+					}
+				}
+			}
+		}
+	}
+}
