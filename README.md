@@ -1,5 +1,3 @@
-<style>body {text-align: justify}</style>
-
 # Character Splitter for DAZ Studio
 
 ![promo jpg](<Scripts/Character Splitter/Character_Splitter_Promo.jpg>)
