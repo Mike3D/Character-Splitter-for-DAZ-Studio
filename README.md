@@ -17,7 +17,7 @@
 * Full control over the final result
 * Fully automated
 
-The tool works with Daz Studio 6, but should also work with previous versions (no warranty). If you're using Daz Studio 4 and the tool doesn't work, you can try [this version](https://github.com/Mike3D/Character-Splitter-for-DAZ-Studio/releases/tag/v3) instead.
+The tool works with Daz Studio 6 only. If for whatever reason you're still using Daz Studio 4, you can use [this version](https://github.com/Mike3D/Character-Splitter-for-DAZ-Studio/releases/tag/v3) instead (beware that many things have been improved, added or fixed since then, and note that you can install multiple versions of Daz Studio, so upgrade to Studio 6 is highly recommended).
 
 ## 'Normalized' head & body parts split
 The focus of this method, documented [here](<User_Manual/Under the hood Normalized.pdf>), is to rescale your character to standard proportions (ie. the base figure), creating head & body morphs that will smoothly blend realistically with almost all the morphs that you own : you won't get a disproportionate head morph for your body morphs or a disproportionate body morph for your head morphs. The scaling needs, especially for non-adult characters or anime & fantasy creatures, are satisfied with the controller morph. This is how it looks when applied to a fantasy character :
@@ -61,17 +61,6 @@ The first 5 tabs of the GUI allow to tailor everything to suit your needs, allow
 * Download this repository by hitting the 'Code' button at the top of this page, then select 'Download ZIP'
 * Extract the 'Scripts' folder to one of your Daz Studio content libraries ('My DAZ 3D Library' is the default, the list is available in Daz Studio menu Edit > Content > Content Directory Manager, and they are visible in the 'Content Library' pane, from which you can open the folders with a right-click > Browse to Folder Location). If you choose 'My DAZ 3D Library' as destination, this will merge into existing 'Scripts' folder
 * You can extract the 'User_Manual' folder anywhere
-
-Your Content Library pane should look like this :
-
-![pane jpg](<User_Manual/Scripts Folder.jpg>)
-
-Note that G8F, G8M & G9 will only appear after running the script for the first time, which will create symbolic links (symlinks) pointing to the DFormer presets found in the 'Developer Kit' folder of each figure, starting from G8.
-Also note that they will appear only if these figures are already installed.
-
-For Windows users, you will have the choice between creating symlinks or duplicating the files, depending on your privileges (administrator required) or your preferences. You can also create the symlinks yourself at any time.
-
-If everything went fine you should see all DFormer presets in the Content Library pane, as pictured above.
 
 ## Usage
 
