@@ -1,0 +1,36 @@
+/*
+	Use this script to create a Daz JSON Link for a head split D-Former supplied by Daz3D
+
+	Modify path & figureName below, save & run this script (current settings are for G9)
+*/
+
+(function(){
+
+// Set path to head split D-Former (relative to Content Library)
+var path = 'People/Genesis 9/Developer Kit/G9 HeadSplit DFormer.duf'; // Source file (relative path)
+var figureName = 'Genesis9'; // Figure name (not label)
+
+// Get asset
+var assetMgr = App.getAssetMgr(); // DzAssetMgr
+
+var assets = assetMgr.findAssetsForFile(path, false, true); // [DzAssetHandle]
+
+if (assets.length < 1)
+{
+	MessageBox.critical('Asset not found. Please verify your path', '\u2620 Fatal Error', 'Exit');
+	return;
+}
+
+var asset = new DzScriptHandle(assets[0]).object; // DzAsset
+
+// Create Daz JSON Link
+var scriptPath = new DzFileInfo(getScriptFileName()).path(); // Path to this file
+var out = '%1/%2.duf.%3'.arg(scriptPath).arg(figureName).arg(asset.getDSLinkExtension()); // Destination = current folder
+if (asset.saveDSLink(out))
+{
+	assetMgr.updateFolderBasedContainers(); // Refresh pane
+	MessageBox.information('Daz JSON Link created', '\u2714 Success', 'OK');
+}
+else MessageBox.critical('Failed to create Daz JSON Link for unknown reason', '\u2620 Fatal Error', 'Exit');
+
+})();
