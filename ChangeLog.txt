@@ -1,0 +1,50 @@
+
+Version 5 :
+- bypass the 'D-Former Load Options' popup by getting head split D-Former weights from duf file. This simplifies the workflow and avoids polluting the scene with the D-Former
+- improved morphs deletion
+- use Daz JSON Links instead of symlinks and move D-Formers to a nested subfolder
+- added a script to create Daz JSON Links for newer Daz figures
+- removed undo holds
+- use ES6 features
+- added changelog
+
+Version 4 :
+- upgraded to Studio 6
+- simplified workflow
+- relevant D-Former preset for the figure is automatically applied (if located in 'Scripts/Character Splitter' folder)
+- reference vertex is automatically inferred from the applied D-Former. Custom (and newer) figures / D-Formers no longer require to manually find & set it. Field is kept in the GUI so it can be overwritten if need be
+- non-morphed attachments (eyelashes, tear, mouth, eyes & eyebrows) no longer need to be deleted, you can now exclude them from 'Head' tab (they are excluded by default)
+- accurately display morphs in the 'Shaping' pane
+- should now be agnostic to your content library paths & custom figures
+- sliders are available on each tab (Head, Body & CTRL) to allow testing morphs without leaving the script
+- added a new 'Preset' tab to allow saving a character preset (when a controller is created), or a shaping preset for each morph (otherwise). This tab becomes available when morph(s) & controller have been created
+- from last tab, you can browse to each dsf file by clicking on its path
+- added a new 'Show Log' button at the bottom of 'Log' tab, which opens Studio log file
+- replaced built-in DzPathComboBox by a custom tree view. This allows to set paths manually or to use a user-friendly interface to browse existing paths from installed morphs
+- limit available base paths to 'Actor > Full Body', 'Actor > Head' & 'Actor > People', which are the relevant paths respectively for body, head and controller in a character split
+- path browser is initialized only when needed, which allows faster start of the script
+- warn user when image card size doesn't match specifications (and expected size is mentioned in the tooltip)
+- re-ordered GUI & splitting logic code to get a clean log file
+- improved morphs & cards deletion
+- process should now exit cleanly when running into trouble (no stalling)
+- optimized code
+
+
+Version 3 :
+- excluding head bones for body morph and body bones for head morphs
+- added missing G8.1 reference vertex
+- addded tutorials for D-Former creation and 'Reference Vertex' use
+- added checks for mandatory plugins on startup
+- added checks for D-Former number of vertices matching base figure
+- 'normalized' becomes the default mode (previously 'WYSIWYG')
+- added plugins page in user manual
+
+Version 2 :
+- It is now necessary to manually zero the base figure before applying the DFormer and your morph(s). This ensures that the morphs applied by default are not baked & applied twice
+- It is no longer allowed to overwrite morphs or to choose labels already in use for other morphs
+- Added a new Tab. You can now delete morphs (dsf files & directories, as well as cached data), which can be handy if something went wrong or you need to 'overwrite' a morph while experimenting different settings
+- replaced the glyphs by Unicode blocks for compatibility purpose
+- added welcome tab with Github link
+
+Version 1 :
+Initial version
