@@ -7,15 +7,22 @@
 				"Follower/Attachment/Head/Face/Eyelashes" : {
 					"type" : "settings",
 					"value" : {
-						"AssetName" : "Genesis8FemaleEyelashes",
-						"AssetFile" : "data/DAZ 3D/Genesis 8/Female Eyelashes/Tools/Script Loads/Genesis 8 Female Eyelashes.duf",
+						"AssetName" : "Genesis8_1FemaleEyelashes",
+						"AssetFile" : "/data/DAZ 3D/Genesis 8/Female 8_1 Eyelashes/Tools/Script Loads/Genesis 8.1 Female Eyelashes.duf"
+					}
+				},
+				"Follower/Attachment/Head/Face/Tears" : {
+					"type" : "settings",
+					"value" : {
+						"AssetName" : "Female 8_1 Tear",
+						"AssetFile" : "/data/DAZ 3D/Genesis 8/Female 8_1 Tear/Tools/Script Loads/Genesis 8.1 Female Tear.duf",
 						"Presets" : {
 							"type" : "settings",
 							"value" : {
 								"Mat" : {
 									"type" : "settings",
 									"value" : {
-										"PresetFile" : "People/Genesis 8 Female/Materials/Base Materials/Iray/Base MAT Eyelashes.duf",
+										"PresetFile" : "/data/DAZ 3D/Genesis 8/Female 8_1/Tools/Script Loads/G8_1FAddOnMaps.duf",
 										"SelectAddon" : false
 									}
 								}

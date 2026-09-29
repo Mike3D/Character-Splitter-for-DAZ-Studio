@@ -1,5 +1,5 @@
 {
-	"PostLoadScriptPath" : "data/DAZ 3D/Genesis 8/Female/Tools/Utilities/Character Addon Loader.dse",
+	"PostLoadScriptPath" : "data/DAZ 3D/Genesis 8/Male/Tools/Utilities/Character Addon Loader.dse",
 	"PostLoadScriptSettings" : {
 		"PostLoadAddons" : {
 			"type" : "settings",
@@ -7,15 +7,15 @@
 				"Follower/Attachment/Head/Face/Eyelashes" : {
 					"type" : "settings",
 					"value" : {
-						"AssetName" : "Genesis8FemaleEyelashes",
-						"AssetFile" : "data/DAZ 3D/Genesis 8/Female Eyelashes/Tools/Script Loads/Genesis 8 Female Eyelashes.duf",
+						"AssetName" : "Genesis8MaleEyelashes",
+						"AssetFile" : "data/DAZ 3D/Genesis 8/Male Eyelashes/Tools/Script Loads/Genesis 8 Male Eyelashes.duf",
 						"Presets" : {
 							"type" : "settings",
 							"value" : {
 								"Mat" : {
 									"type" : "settings",
 									"value" : {
-										"PresetFile" : "People/Genesis 8 Female/Materials/Base Materials/Iray/Base MAT Eyelashes.duf",
+										"PresetFile" : "People/Genesis 8 Male/Materials/Base Materials/Iray/Base MAT Eyelashes.duf",
 										"SelectAddon" : false
 									}
 								}
