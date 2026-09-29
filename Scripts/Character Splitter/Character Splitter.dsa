@@ -13,13 +13,13 @@
 
 try { (function(oNode) {
 
-var actionMgr = MainWindow.getActionMgr(); // DzActionMgr
-var assetIOMgr = App.getAssetIOMgr(); // DzAssetIOMgr
-var assetMgr = App.getAssetMgr(); // DzAssetMgr
-var contentMgr = App.getContentMgr(); // DzContentMgr
-var helper = new DzSceneHelper();
+const actionMgr = MainWindow.getActionMgr(); // DzActionMgr
+const assetIOMgr = App.getAssetIOMgr(); // DzAssetIOMgr
+const assetMgr = App.getAssetMgr(); // DzAssetMgr
+const contentMgr = App.getContentMgr(); // DzContentMgr
+const helper = new DzSceneHelper();
 
-var scriptPath = new DzFileInfo(getScriptFileName()).path(); // Path to this file
+const scriptPath = new DzFileInfo(getScriptFileName()).path(); // Path to this file
 
 function FullPathChecked(str) { return str.isEmpty() ? '' : contentMgr.getAbsolutePath(DzContentMgr.NativeDirs, str); } // Return full path from relative path if path exists, empty string otherwise
 
@@ -40,15 +40,15 @@ function ErrorMessage(txt, title = '\u2620 Fatal Error', btn = 'Exit')
 //=========================
 function CheckPlugins()
 {
-	var errors = [];
+	const errors = [];
 
-	var plugins = ['Asset Save Filters', 'Customize Interface', 'Default Save Filters', 'Joint Editor Tool', 'Property Hierarchy Pane']; // Mandatory plugins
+	const plugins = ['Asset Save Filters', 'Customize Interface', 'Default Save Filters', 'Joint Editor Tool', 'Property Hierarchy Pane']; // Mandatory plugins
 	for (const name of plugins)
 	{
-		var p = App.getPluginMgr().findPlugin(name);
+		const p = App.getPluginMgr().findPlugin(name);
 
 		// Missing plugin
-		if (p == null)
+		if (p === null)
 			errors.push([name, 'Missing']);
 
 		// Plugin not loaded
@@ -71,17 +71,17 @@ function CheckPlugins()
 function ErrorDialog(errors, title, items)
 {
 	// Create a dialog
-	var dlg = new DzDialog();
+	const dlg = new DzDialog();
 	dlg.caption = '\u2620\u2620';
 	dlg.minWidth = 195; dlg.minHeight = 215;
 
-	var dlgGB = new DzVGroupBox(dlg);
+	const dlgGB = new DzVGroupBox(dlg);
 
 	if (errors.length > 0)
 	{
-		var gbox = VGroupBox(dlgGB, title);
+		const gbox = VGroupBox(dlgGB, title);
 
-		var errorsLV = new DzListView(gbox);
+		const errorsLV = new DzListView(gbox);
 
 		for (var i = 0; i < items.length; i++)
 		{
@@ -131,7 +131,7 @@ if (!oNode || !oNode.getObject())
 //=========================
 function GetAttachments()
 {
-	var out = [];
+	const out = [];
 
 	for (const fig of Scene.getSkeletonList())
 		if (fig != oNode)
@@ -143,8 +143,8 @@ function GetAttachments()
 //=========================
 // Global variables
 //=========================
-var figName = oNode.name; // String
-var attachments = GetAttachments(); // Attachment figures ([DzFigure])
+const figName = oNode.name; // String
+const attachments = GetAttachments(); // Attachment figures ([DzFigure])
 var attachmentsLV; // DzListView used for presenting attachments in Tab #1 Head
 var deformer; // D-Former (DzDForm)
 var src; //  Base geometry (DzVertexMesh)
@@ -160,8 +160,6 @@ var treeView; // Tree View for path browser (DzListView)
 var paths = []; // List of indicative morphs paths found under 'Actor' region ([String])
 var selection = []; // Selected attachment figures
 
-var basePath = oNode.assetUri.toPath().replace(oNode.assetUri.filePath, ''); // Absolute path to Content Library for the selected figure
-
 //=========================================  GUI  =========================================
 
 //==================
@@ -170,7 +168,7 @@ var basePath = oNode.assetUri.toPath().replace(oNode.assetUri.filePath, ''); // 
 
 function Label(parent, txt, width)
 {
-	var lab = new DzLabel(parent);
+	const lab = new DzLabel(parent);
 	lab.text = txt;
 	if (width) lab.setFixedWidth(width);
 	return lab;
@@ -178,18 +176,18 @@ function Label(parent, txt, width)
 
 function LineEdit(parent, tip = '')
 {
-	var le = new DzLineEdit(parent);
+	const le = new DzLineEdit(parent);
 	if (tip) le.placeholderText = tip;
 	return le;
 }
 
 function LabelledLineEdit(parent, layout, row, labelTxt, width, tip)
 {
-	var label = Label(parent, labelTxt, width);
+	const label = Label(parent, labelTxt, width);
 	if (layout)
 		layout.addWidget(label, row, 0);
 
-	var le = LineEdit(parent, tip);
+	const le = LineEdit(parent, tip);
 	if (layout)
 		layout.addWidget(le, row, 1);
 	return le;
@@ -197,7 +195,7 @@ function LabelledLineEdit(parent, layout, row, labelTxt, width, tip)
 
 function Button(parent, txt = '', tip = '')
 {
-	var btn = new DzPushButton(parent);
+	const btn = new DzPushButton(parent);
 	if (txt) btn.text = txt;
 	if (tip) btn.toolTip = tip;
 	return btn;
@@ -205,7 +203,7 @@ function Button(parent, txt = '', tip = '')
 
 function CheckBox(parent, txt, checked, tip)
 {
-	var box = new DzCheckBox(parent);
+	const box = new DzCheckBox(parent);
 	box.text = txt;
 	box.checked = checked;
 	if (tip) box.toolTip = tip;
@@ -214,10 +212,10 @@ function CheckBox(parent, txt, checked, tip)
 
 function ColorWidget(parent, layout, row, txt, width, color, tip)
 {
-	var label = Label(parent, txt, width);
+	const label = Label(parent, txt, width);
 	layout.addWidget(label, row, 0);
 
-	var wgt = new DzColorWgt(parent);
+	const wgt = new DzColorWgt(parent);
 	layout.addWidget(wgt, row, 1);
 	wgt.value = color;
 	wgt.toolTip = tip;
@@ -226,11 +224,11 @@ function ColorWidget(parent, layout, row, txt, width, color, tip)
 
 function Slider(parent, layout, row, txt, width, value, sensitivity, asPercent, editable, tip, max=10)
 {
-	var label = Label(parent, txt, null);
+	const label = Label(parent, txt, null);
 	if (layout)
 		layout.addWidget(label, row, 0);
 
-	var wgt = new DzFloatSlider(parent);
+	const wgt = new DzFloatSlider(parent);
 	if (layout)
 		layout.addWidget(wgt, row, 1);
 	wgt.setFixedWidth(width);
@@ -247,7 +245,7 @@ function Slider(parent, layout, row, txt, width, value, sensitivity, asPercent, 
 
 function VGroupBox(parent, title = '', hide = false)
 {
-	var box = new DzVGroupBox(parent);
+	const box = new DzVGroupBox(parent);
 	box.title = title;
 	if (hide) box.hide();
 	return box;
@@ -255,11 +253,11 @@ function VGroupBox(parent, title = '', hide = false)
 
 function PathBrowser(parent, layout, row, txt, width, sel)
 {
-	var le = LabelledLineEdit(parent, layout, row, txt, width);
+	const le = LabelledLineEdit(parent, layout, row, txt, width);
 	le.toolTip = 'Enter path for display in Shaping & Parameters panes, or click button to the right to use an already existing path';
 	le.text = sel;
 
-	var btn = Button(parent, '...', 'Browse to already existing paths from your installed morphs');
+	const btn = Button(parent, '...', 'Browse to already existing paths from your installed morphs');
 	if (layout)
 		layout.addWidget(btn, row, 2);
 	connect(btn, 'clicked', function() { PathDialog(le) });
@@ -268,11 +266,11 @@ function PathBrowser(parent, layout, row, txt, width, sel)
 
 function CardSelect(parent, w=147, h=185)
 {
-	var gbox = new DzGroupBox(parent);
+	const gbox = new DzGroupBox(parent);
 	gbox.title = 'Card Image';
 	gbox.toolTip = 'Optional : browse to your image file (%1x%2 pixels transparent PNG, can be located anywhere). If left empty, you can later drop your PNG image files in your Product folder (hint: you can browse to it from last tab)'.arg(w).arg(h);
 
-	var btn = Button(gbox, '...');
+	const btn = Button(gbox, '...');
 	btn.setFixedSize(w, h);
 	btn.sizedFromIcon = true;
 	connect(btn, 'clicked', function() { CardSelected(btn); });
@@ -282,7 +280,7 @@ function CardSelect(parent, w=147, h=185)
 function CardSelected(btn)
 {
 	// Open directory browser
-	var file = FileDialog.doFileDialog(true, '', '', 'PNG File (*.png)'); // String (full file path)
+	const file = FileDialog.doFileDialog(true, '', '', 'PNG File (*.png)'); // String (full file path)
 	if (file.isEmpty()) return; // Cancelled by user
 
 	// Display thumbnail & store selected file path in toolTip
@@ -298,9 +296,9 @@ function CardSelected(btn)
 //==================
 // Window
 //==================
-var window = new DzDialog(); window.caption = 'Character Splitter V5';
+const window = new DzDialog(); window.caption = 'Character Splitter V5';
 window.minWidth = 410;
-var layout = new DzBoxLayout(window);
+const layout = new DzBoxLayout(window);
 
 //==================
 // Path Tree View
@@ -309,11 +307,11 @@ var layout = new DzBoxLayout(window);
 // Collect morphs paths
 function GetMorphsPaths()
 {
-	var out = [];
+	const out = [];
 
 	for (const prop of helper.getPropertiesOnNode(oNode))
 	{
-		var region = prop.getRegion();
+		const region = prop.getRegion();
 
 		if (region !== null && ['Actor', 'Head'].indexOf(region.name) >= 0) // Actor > Full Body, Actor > Head & Actor > People
 			out.pushIfNotExists(prop.getPath().slice(1)); // Note : with first slash removed
@@ -342,7 +340,7 @@ function BuildTree(paths)
 // Insert an item in the Tree View
 function InsertItem(parent, txt)
 {
-	var item = new DzListViewItem(parent);
+	const item = new DzListViewItem(parent);
 	item.setText(0, txt);
 	return item;
 }
@@ -350,7 +348,7 @@ function InsertItem(parent, txt)
 // Recursively insert items in the Tree View
 function InsertItems(parent, key, data)
 {
-	var item = InsertItem(parent, key); // DzListViewItem
+	const item = InsertItem(parent, key); // DzListViewItem
 
 	if (typeof data === 'object' && !Array.isArray(data)) // Dict
 	{
@@ -411,12 +409,12 @@ function SelectPath(out)
 	pathDialog.hide(); // Hide dialog
 
 	// Get Tree View selection
-	var sel = treeView.currentItem();
+	const sel = treeView.currentItem();
 	if (!sel)
 		return;
 
 	// Convert selection to path by recursively climbing to its root
-	var path = [sel.text(0)];
+	const path = [sel.text(0)];
 	while (sel.parent())
 	{
 		sel = sel.parent();
@@ -440,21 +438,21 @@ function PathDialog(out)
 //==================
 // Display 8 tabs
 //==================
-var tabs = new DzTabWidget(window);
+const tabs = new DzTabWidget(window);
 layout.addWidget(tabs);
-var tab0 = new DzVGroupBox(tabs); tabs.addTab(tab0, '\u2665');
-var tab1 = new DzVGroupBox(tabs); tabs.addTab(tab1, 'Head');		tabs.setTabToolTip(1, 'Head when splitting, Full figure otherwise');
-var tab2 = new DzVGroupBox(tabs); tabs.addTab(tab2, 'Body');		tabs.setTabToolTip(2, 'Body when splitting, Disabled otherwise');
-var tab3 = new DzVGroupBox(tabs); tabs.addTab(tab3, 'CTRL');		tabs.setTabToolTip(3, 'Controller for Head + Body (used to apply full character)');
-var tab4 = new DzVGroupBox(tabs); tabs.addTab(tab4, 'Settings');	tabs.setTabToolTip(4, 'Global settings & Save Morph(s) button');
-var tab5 = new DzVGroupBox(tabs); tabs.addTab(tab5, 'Preset');		tabs.setTabEnabled(5, false); // Hidden @ start (enabled after morphs creation)
-var tab6 = new DzVGroupBox(tabs); tabs.addTab(tab6, 'Log');			tabs.setTabToolTip(6, 'Log Report & Link to Studio log file');
-var tab7 = new DzVGroupBox(tabs); tabs.addTab(tab7, '\u2620');		tabs.setTabToolTip(7, 'Find, access and delete morphs');
+const tab0 = new DzVGroupBox(tabs); tabs.addTab(tab0, '\u2665');
+const tab1 = new DzVGroupBox(tabs); tabs.addTab(tab1, 'Head');			tabs.setTabToolTip(1, 'Head when splitting, Full figure otherwise');
+const tab2 = new DzVGroupBox(tabs); tabs.addTab(tab2, 'Body');			tabs.setTabToolTip(2, 'Body when splitting, Disabled otherwise');
+const tab3 = new DzVGroupBox(tabs); tabs.addTab(tab3, 'CTRL');			tabs.setTabToolTip(3, 'Controller for Head + Body (used to apply full character)');
+const tab4 = new DzVGroupBox(tabs); tabs.addTab(tab4, 'Settings');		tabs.setTabToolTip(4, 'Global settings & Save Morph(s) button');
+const tab5 = new DzVGroupBox(tabs); tabs.addTab(tab5, 'Preset');		tabs.setTabEnabled(5, false); // Hidden @ start (enabled after morphs creation)
+const tab6 = new DzVGroupBox(tabs); tabs.addTab(tab6, 'Log');			tabs.setTabToolTip(6, 'Log Report & Link to Studio log file');
+const tab7 = new DzVGroupBox(tabs); tabs.addTab(tab7, '\u2620');		tabs.setTabToolTip(7, 'Find, access and delete morphs');
 
 //==================================  Tab #0 '♥' (Welcome)  =================================
 
-var giturl = 'https://github.com/Mike3D/Character-Splitter-for-DAZ-Studio';
-var gitbtn = Button(tab0, '', giturl);
+const giturl = 'https://github.com/Mike3D/Character-Splitter-for-DAZ-Studio';
+const gitbtn = Button(tab0, '', giturl);
 gitbtn.pixmap = new Pixmap(scriptPath + '/Character_Splitter_Promo.jpg');
 gitbtn.iconSize = gitbtn.pixmap.size;
 gitbtn.sizedFromIcon = true;
@@ -462,29 +460,29 @@ connect(gitbtn, 'clicked', function() { App.showURL(giturl); });
 
 //==================================  Tab #6 'Log'  =================================
 
-var groupbox6 = VGroupBox(tab6, 'Log Report');
-var logBox = new DzListBox(groupbox6);
-var logBtn = Button(tab6, 'Show Log', 'Open Studio log file (equivalent to Help > Troobleshooting > View Log File... from menu');
+const groupbox6 = VGroupBox(tab6, 'Log Report');
+const logBox = new DzListBox(groupbox6);
+const logBtn = Button(tab6, 'Show Log', 'Open Studio log file (equivalent to Help > Troobleshooting > View Log File... from menu');
 connect(logBtn, 'clicked', function() { trigger_action('DzLogFileAction'); }); // 'Show Log' button
 
 //==================================  Tab #7 '☠'  =================================
 
-var groupbox7_1 = VGroupBox(tab7, 'Morphs To Delete');
-var layout7_1 = new DzGridLayout(groupbox7_1);
+const groupbox7_1 = VGroupBox(tab7, 'Morphs To Delete');
+const layout7_1 = new DzGridLayout(groupbox7_1);
 
 //==================
 // Display 3 slots for morph names
 //==================
-var morph1Name = LabelledLineEdit(groupbox7_1, layout7_1, 0, 'Head Name', 60, 'Morph Name');
-var morph2Name = LabelledLineEdit(groupbox7_1, layout7_1, 1, 'Body Name', 60, 'Morph Name');
-var morph3Name = LabelledLineEdit(groupbox7_1, layout7_1, 2, 'CTRL Name', 60, 'Morph Name');
+const morph1Name = LabelledLineEdit(groupbox7_1, layout7_1, 0, 'Head Name', 60, 'Morph Name');
+const morph2Name = LabelledLineEdit(groupbox7_1, layout7_1, 1, 'Body Name', 60, 'Morph Name');
+const morph3Name = LabelledLineEdit(groupbox7_1, layout7_1, 2, 'CTRL Name', 60, 'Morph Name');
 
 //==================
 // Display 'Find Morph(s)' button
 //==================
-var groupbox7_2 = new DzVGroupBox(tab7); // 'Find Morph(s)'
-var groupbox7_3 = VGroupBox(tab7, '', true); // 'Delete Morph(s)' button (hidden @ start)
-var button_find = Button(groupbox7_2, 'Find Morph(s)');
+const groupbox7_2 = new DzVGroupBox(tab7); // 'Find Morph(s)'
+const groupbox7_3 = VGroupBox(tab7, '', true); // 'Delete Morph(s)' button (hidden @ start)
+const button_find = Button(groupbox7_2, 'Find Morph(s)');
 connect(button_find, 'clicked', FindMorphs);
 
 function FindMorphs()
@@ -494,7 +492,7 @@ function FindMorphs()
 	{
 		delView = new DzListView(groupbox7_2);
 
-		var items = ['Morph', 'Author', 'Path'];
+		const items = ['Morph', 'Author', 'Path'];
 		for (var i = 0; i < items.length; i++)
 		{
 			delView.addColumn(items[i]);
@@ -522,13 +520,13 @@ function FindMorphs()
 	{
 		for (const name of names)
 		{
-			var prop = helper.findPropertyOnNodeByInternalName(name, node); // DzProperty
+			const prop = helper.findPropertyOnNodeByInternalName(name, node); // DzProperty
 			if (!prop)
 				continue;
 
-			var to_use = helper.isNodeProperty(prop) ? prop : prop.getOwner(); // Decide whether to use prop (CTRL) or morph (Head & Body)
+			const to_use = helper.isNodeProperty(prop) ? prop : prop.getOwner(); // Decide whether to use prop (CTRL) or morph (Head & Body)
 
-			var item = new DzCheckListItem(delView, DzCheckListItem.CheckBox);
+			const item = new DzCheckListItem(delView, DzCheckListItem.CheckBox);
 			item.setText(0, name); // Name
 			item.setText(1, to_use.assetAuthor.name); // Artist
 			item.setText(2, to_use.assetSource.isEmpty() ? to_use.assetUri.toPath() : to_use.assetSource.toPath()); // Absolute file Path - Note: when the morph is in 'modified' state, assetUri is empty & assetSource is not empty (and vice-versa)
@@ -550,7 +548,7 @@ function FindMorphs()
 //==================
 // Display 'Delete Morph(s)' button
 //==================
-var button_delete = Button(groupbox7_3, 'Delete Morph(s)', 'Delete Selected morph(s)');
+const button_delete = Button(groupbox7_3, 'Delete Morph(s)', 'Delete Selected morph(s)');
 connect(button_delete, 'clicked', DeleteMorphs);
 
 function DeleteMorphs()
@@ -559,30 +557,30 @@ function DeleteMorphs()
 
 	for (const item_data of morph_items) // [item, prop]
 	{
-		var [item, prop] = item_data; // Unpack item data ([DzCheckListItem, DzProperty])
+		const [item, prop] = item_data; // Unpack item data ([DzCheckListItem, DzProperty])
 
 		// Skip unchecked item
 		if (!item.on)
 			continue;
 
 		// Delete card
-		var cardPath = FullPathChecked(prop.getPresentation().iconLarge);
+		const cardPath = FullPathChecked(prop.getPresentation().iconLarge);
 		if (!cardPath.isEmpty())
 		{
-			var fi = new DzFileInfo(cardPath);
+			const fi = new DzFileInfo(cardPath);
 			fi.remove(); // Delete file
 		}
 
 		// Delete dsf file
 		if (!item.text(2).isEmpty())
 		{
-			var fi = new DzFileInfo(item.text(2));
+			const fi = new DzFileInfo(item.text(2));
 			if (fi.remove()) // Delete file
 				logBox.insertItem('\u2714 Deleted %1'.arg(item.text(2)));
 			else logBox.insertItem('\u2620 Failed to delete %1'.arg(item.text(2)));
 
 			// Also remove empty directories in path
-			var p = File2Path(item.text(2)); // Morph directory
+			const p = File2Path(item.text(2)); // Morph directory
 			new DzDir(p).rmpath(p);
 		}
 
@@ -599,13 +597,13 @@ function DeleteMorphs()
 //==================
 // Display Morph 'Name' line edit
 //==================
-var groupbox1_1 = new DzVGroupBox(tab1);
-var layout1_1 = new DzGridLayout(groupbox1_1);
-var morphName = LabelledLineEdit(groupbox1_1, layout1_1, 0, 'Name', 35, 'Morph Name');
+const groupbox1_1 = new DzVGroupBox(tab1);
+const layout1_1 = new DzGridLayout(groupbox1_1);
+const morphName = LabelledLineEdit(groupbox1_1, layout1_1, 0, 'Name', 35, 'Morph Name');
 
 function CheckDupliName(srcName, srcLabel, srcDel)
 {
-	var name = srcName.text;
+	const name = srcName.text;
 
 	if (!name.isEmpty() && helper.findPropertyOnNodeByInternalName(name, oNode)) // Morph exists => replace input by placeholder notification
 	{
@@ -620,13 +618,13 @@ function CheckDupliName(srcName, srcLabel, srcDel)
 //==================
 // Display Morph 'Label' line edit
 //==================
-var morphLabel = LabelledLineEdit(groupbox1_1, layout1_1, 1, 'Label', 35, 'Morph Label');
+const morphLabel = LabelledLineEdit(groupbox1_1, layout1_1, 1, 'Label', 35, 'Morph Label');
 connect(morphLabel, 'editingFinished', function() { CheckDupliLabel(morphLabel); });
 connect(morphName, 'editingFinished', function() { CheckDupliName(morphName, morphLabel, morph1Name); });
 
 function CheckDupliLabel(srcLabel)
 {
-	var label = srcLabel.text;
+	const label = srcLabel.text;
 
 	if (!label.isEmpty() && helper.findPropertyOnNodeByLabel(label, oNode)) // Label exists => replace input by placeholder notification
 	{
@@ -638,7 +636,7 @@ function CheckDupliLabel(srcLabel)
 //==================
 // Display Morph 'Path' line edit
 //==================
-var morph_path = PathBrowser(groupbox1_1, layout1_1, 2, 'Path', 35, 'Actor/Head/People/Real World');
+const morph_path = PathBrowser(groupbox1_1, layout1_1, 2, 'Path', 35, 'Actor/Head/People/Real World');
 
 //==================
 // Display 'Morphed Attachments' list view
@@ -652,11 +650,11 @@ if (attachments.length !== 0)
 	attachmentsLV.addColumn('Morphed Attachments');
 
 	// Display figure label
-	for (var i = 0; i < attachments.length; i++)
+	for (const attachment of attachments)
 	{
 		var item = new DzCheckListItem(attachmentsLV, DzCheckListItem.CheckBox, attachmentsLV.childCount);
-		item.setText(0, attachments[i].getLabel());
-		item.on = IsMorphed(attachments[i]); // Checked if a morph is applied
+		item.setText(0, attachment.getLabel());
+		item.on = IsMorphed(attachment); // Checked if a morph is applied
 	}
 }
 
@@ -674,13 +672,13 @@ function IsMorphed(fig)
 //==================
 // Display 'Card Image' button for file browser / file path line edit
 //==================
-var selectedCard = CardSelect(tab1, 91, 91);
+const selectedCard = CardSelect(tab1, 91, 91);
 
 //==================
 // Display 'Head Morph Slider'
 //==================
-var groupbox1_2 = VGroupBox(tab1, 'Head Morph Slider', true); // Hidden @ start (enabled when morph has been created)
-var head_slider = Slider(groupbox1_2, null, 0, '', 200, 0, 0.1, true, false, '', 1);
+const groupbox1_2 = VGroupBox(tab1, 'Head Morph Slider', true); // Hidden @ start (enabled when morph has been created)
+const head_slider = Slider(groupbox1_2, null, 0, '', 200, 0, 0.1, true, false, '', 1);
 var doSplit; // Tab #4 'Split Morph' checkbox
 connect(head_slider, 'valueChanged', function(value) { morphs[0].setValue(value); }); // Sync morph with slider
 connect(head_slider, 'editEnd', function() { head_slider.value = 0; }); // Reset on release
@@ -690,38 +688,38 @@ connect(head_slider, 'editEnd', function() { head_slider.value = 0; }); // Reset
 //==================
 // Display Morph 'Name' line edit
 //==================
-var groupbox2_1 = new DzVGroupBox(tab2);
-var layout2_1 = new DzGridLayout(groupbox2_1);
-var morphName2 = LabelledLineEdit(groupbox2_1, layout2_1, 0, 'Name', 35, 'Morph Name');
+const groupbox2_1 = new DzVGroupBox(tab2);
+const layout2_1 = new DzGridLayout(groupbox2_1);
+const morphName2 = LabelledLineEdit(groupbox2_1, layout2_1, 0, 'Name', 35, 'Morph Name');
 
 //==================
 // Display Morph 'Label' line edit
 //==================
-var morphLabel2 = LabelledLineEdit(groupbox2_1, layout2_1, 1, 'Label', 35, 'Morph Label');
+const morphLabel2 = LabelledLineEdit(groupbox2_1, layout2_1, 1, 'Label', 35, 'Morph Label');
 connect(morphLabel2, 'editingFinished', function() { CheckDupliLabel(morphLabel2); });
 connect(morphName2, 'editingFinished', function() { CheckDupliName(morphName2, morphLabel2, morph2Name); });
 
 //==================
 // Display Morph 'Path' line edit
 //==================
-var morph_path2 = PathBrowser(groupbox2_1, layout2_1, 2, 'Path', 35, 'Actor/Full Body/People/Real World');
+const morph_path2 = PathBrowser(groupbox2_1, layout2_1, 2, 'Path', 35, 'Actor/Full Body/People/Real World');
 
 //==================
 // Display 'Reference Vertex' line edit
 //==================
-var refVertex = LabelledLineEdit(groupbox2_1, layout2_1, 3, 'Vertex', 35, 'Reference Vertex for D-Former');
+const refVertex = LabelledLineEdit(groupbox2_1, layout2_1, 3, 'Vertex', 35, 'Reference Vertex for D-Former');
 refVertex.toolTip = 'Reference Vertex, inferred from the applied D-Former. Should be left as-is in most cases, but can be freely overwritten';
 
 //==================
 // Display 'Card Image' button for file browser / file path line edit
 //==================
-var selectedCard2 = CardSelect(tab2);
+const selectedCard2 = CardSelect(tab2);
 
 //==================
 // Display 'Body Morph Slider'
 //==================
-var groupbox2_2 = VGroupBox(tab2, 'Body Morph Slider', true); // Hidden @ start (enabled when morph has been created)
-var body_slider = Slider(groupbox2_2, null, 0, '', 200, 0, 0.1, true, false, '', 1);
+const groupbox2_2 = VGroupBox(tab2, 'Body Morph Slider', true); // Hidden @ start (enabled when morph has been created)
+const body_slider = Slider(groupbox2_2, null, 0, '', 200, 0, 0.1, true, false, '', 1);
 connect(body_slider, 'valueChanged', function(value) { morphs[1].setValue(value); }); // Sync morph with slider
 connect(body_slider, 'editEnd', function() { body_slider.value = 0; }); // Reset on release
 
@@ -730,37 +728,37 @@ connect(body_slider, 'editEnd', function() { body_slider.value = 0; }); // Reset
 //==================
 // Display Controller 'Name' line edit
 //==================
-var groupbox3_1 = VGroupBox(tab3, 'Controller Morph');
-var layout3_1 = new DzGridLayout(groupbox3_1);
-var ctrl_name = LabelledLineEdit(groupbox3_1, layout3_1, 0, 'Name', 35, 'Morph Controller Name');
+const groupbox3_1 = VGroupBox(tab3, 'Controller Morph');
+const layout3_1 = new DzGridLayout(groupbox3_1);
+const ctrl_name = LabelledLineEdit(groupbox3_1, layout3_1, 0, 'Name', 35, 'Morph Controller Name');
 
 //==================
 // Display Controller 'Label' line edit
 //==================
-var ctrl_label = LabelledLineEdit(groupbox3_1, layout3_1, 1, 'Label', 30, 'Morph Controller Label');
+const ctrl_label = LabelledLineEdit(groupbox3_1, layout3_1, 1, 'Label', 30, 'Morph Controller Label');
 connect(ctrl_label, 'editingFinished', function() { CheckDupliLabel(ctrl_label); });
 connect(ctrl_name, 'editingFinished', function() { CheckDupliName(ctrl_name, ctrl_label, morph3Name); });
 
 //==================
 // Display Controller 'Path' line edit
 //==================
-var ctrl_path = PathBrowser(groupbox3_1, layout3_1, 2, 'Path', 35, 'Actor/People/Real World');
+const ctrl_path = PathBrowser(groupbox3_1, layout3_1, 2, 'Path', 35, 'Actor/People/Real World');
 
 //==================
 // Display Controller 'Scale' Slider
 //==================
-var scale = Slider(groupbox3_1, layout3_1, 3, 'Scale', 300, 1, 0.01, true, true, 'Allows to rescale your character. Should be left as-is in most cases. Especially useful for non-adult, anime or fantasy characters');
+const scale = Slider(groupbox3_1, layout3_1, 3, 'Scale', 300, 1, 0.01, true, true, 'Allows to rescale your character. Should be left as-is in most cases. Especially useful for non-adult, anime or fantasy characters');
 
 //==================
 // Display Controller 'Card Image' button for file browser / file path line edit
 //==================
-var selectedCard3 = CardSelect(tab3);
+const selectedCard3 = CardSelect(tab3);
 
 //==================
 // Display 'Controller Morph Slider'
 //==================
-var groupbox3_2 = VGroupBox(tab3, 'Controller Slider', true); // Hidden @ start (enabled when controller has been created)
-var ctrl_slider = Slider(groupbox3_2, null, 0, '', 200, 0, 0.1, true, false, '', 1);
+const groupbox3_2 = VGroupBox(tab3, 'Controller Slider', true); // Hidden @ start (enabled when controller has been created)
+const ctrl_slider = Slider(groupbox3_2, null, 0, '', 200, 0, 0.1, true, false, '', 1);
 connect(ctrl_slider, 'valueChanged', CtrlSliderChanged);
 connect(ctrl_slider, 'editEnd', function() { ctrl_slider.value = 0; }); // Reset on release
 
@@ -768,7 +766,7 @@ function GetController() { return helper.findPropertyOnNodeByInternalName(ctrl_n
 
 function CtrlSliderChanged(value)
 {
-	var controller = GetController();
+	const controller = GetController();
 	if (controller)
 		controller.setValue(value);
 }
@@ -783,45 +781,57 @@ doSplit = CheckBox(tab4, 'Split Shape Using a D-Former', true, 'Whether to split
 //==================
 // Display 'Create Controller' checkbox
 //==================
-var ctrl = CheckBox(tab4, 'Create Controller', true, 'Whether to create a controller to drive both morphs');
+const ctrl = CheckBox(tab4, 'Create Controller', true, 'Whether to create a controller to drive both morphs');
 connect(ctrl, 'clicked', function() { tabs.setTabEnabled(3, ctrl.checked && doSplit.checked); });
 connect(doSplit, 'clicked', function() { tabs.setTabEnabled(2, doSplit.checked); tabs.setTabEnabled(3, doSplit.checked && ctrl.checked); doSplit.checked ? ctrl.show() : ctrl.hide(); });
 
 //==================
 // Display 'Normalize Figure' checkbox
 //==================
-var normalize = CheckBox(tab4, 'Normalize Figure', true, 'Whether to rescale morphs to match base figure proportions');
+const normalize = CheckBox(tab4, 'Normalize Figure', true, 'Whether to rescale morphs to match base figure proportions');
 
 //==================
 // Display 'Vendor' line edit
 //==================
-var groupbox4_1 = VGroupBox(tab4, 'Morph Asset Settings');
-var layout4_1 = new DzGridLayout(groupbox4_1);
-var vendor = LabelledLineEdit(groupbox4_1, layout4_1, 0, 'Vendor', 40, 'Vendor folder inside the Morphs folder. Default is Author, as set in Edit > Preferences');
+const groupbox4_1 = VGroupBox(tab4, 'Morph Asset Settings');
+const layout4_1 = new DzGridLayout(groupbox4_1);
+const vendor = LabelledLineEdit(groupbox4_1, layout4_1, 0, 'Vendor', 40, 'Vendor folder inside the Morphs folder. Default is Author, as set in Edit > Preferences');
 vendor.text = App.getCurrentAuthor().name;
 
 //==================
 // Display 'Product' line edit
 //==================
-var product = LabelledLineEdit(groupbox4_1, layout4_1, 1, 'Product', 40, 'Create a sub-folder inside your Vendor folder');
+const product = LabelledLineEdit(groupbox4_1, layout4_1, 1, 'Product', 40, 'Create a sub-folder inside your Vendor folder');
 
 //==================
 // Display 'Compress Morph' checkbox
 //==================
-var compress = CheckBox(groupbox4_1, 'Compress Files', true, 'Whether to compress the dsf/duf file(s)');
+const compress = CheckBox(groupbox4_1, 'Compress Files', true, 'Whether to compress the dsf/duf file(s)');
+
+//==================
+//Display 'Select Output Content Library' dropdown
+//==================
+libCombo = new DzComboBox(groupbox4_1); libCombo.toolTip = 'Select the Content Library where you want to export the morphs, controllers & characters';
+const cloud = contentMgr.getCloudContentDirectoryPath().folderName;
+for (var i = 0; i < contentMgr.getNumContentDirectories(); i++)
+{
+	const dir = contentMgr.getContentDirectory(i).folderName;
+	if (dir !== cloud)
+		libCombo.addItem(dir);
+}
 
 //==================
 // Display 2 color pickers for Presentation
 //==================
-var groupbox4_2 = VGroupBox(tab4, 'Presentation Colors');
-var layout4_2 = new DzGridLayout(groupbox4_2);
-var colorA = ColorWidget(groupbox4_2, layout4_2, 0, 'Color A', 35, new Color(90, 90, 90), 'Gradient Top/Left');
-var colorB = ColorWidget(groupbox4_2, layout4_2, 1, 'Color B', 35, new Color(255, 255, 255), 'Gradient Bottom/Right');
+const groupbox4_2 = VGroupBox(tab4, 'Presentation Colors');
+const layout4_2 = new DzGridLayout(groupbox4_2);
+const colorA = ColorWidget(groupbox4_2, layout4_2, 0, 'Color A', 35, new Color(90, 90, 90), 'Gradient Top/Left');
+const colorB = ColorWidget(groupbox4_2, layout4_2, 1, 'Color B', 35, new Color(255, 255, 255), 'Gradient Bottom/Right');
 
 //==================
 // Display 'Save Morph(s)' button
 //==================
-var button_save = Button(tab4, 'Save Morph(s)', 'Create & Save morph(s) from current object shape');
+const button_save = Button(tab4, 'Save Morph(s)', 'Create & Save morph(s) from current object shape');
 connect(button_save, 'clicked', ValidateSetup);
 
 //==================================  Tab #5 'Preset'  =================================
@@ -829,8 +839,8 @@ connect(button_save, 'clicked', ValidateSetup);
 //==================
 // Display 'Output Directory' button
 //==================
-var groupbox5_0 = VGroupBox(tab5, 'Output Directory');
-var button_char_dir = new DzPushButton(groupbox5_0);
+const groupbox5_0 = VGroupBox(tab5, 'Output Directory');
+const button_char_dir = new DzPushButton(groupbox5_0);
 connect(button_char_dir, 'clicked', DirectoryPresetClicked);
 
 function DirectoryPresetClicked()
@@ -841,7 +851,7 @@ function DirectoryPresetClicked()
 	else
 	{
 		// Open directory browser
-		var file = FileDialog.doDirectoryDialog('Select Output Directory', '', button_char_dir.text, tab5); // String (full dir path)
+		const file = FileDialog.doDirectoryDialog('Select Output Directory', '', button_char_dir.text, tab5); // String (full dir path)
 		if (file.isEmpty()) return; // Cancelled by user
 		button_char_dir.text = file;
 	}
@@ -854,11 +864,11 @@ var charName, doMaterial, selectedCard5_1, selectedCard5_2;
 //==================
 function CreateTab5()
 {
-	var kind = ctrl.checked ? 'Characters' : 'Shaping'; // Character preset if we have a controller, Shaping presets otherwise
+	const kind = ctrl.checked ? 'Characters' : 'Shaping'; // Character preset if we have a controller, Shaping presets otherwise
 
 	tabs.setTabToolTip(5, 'Save %1 Preset(s)'.arg(kind));
-	var out = FullPathChecked('Presets/' + kind); // @start, we'll use Presets/Characters or Presets/Shaping folder if available, base path otherwise
-	button_char_dir.text = out.isEmpty() ? basePath : out; button_char_dir.toolTip = 'Select where to export your %1 preset(s). Press shift to open output directory'.arg(kind);
+	const out = FullPathChecked('Presets/' + kind); // @start, we'll use Presets/Characters or Presets/Shaping folder if available, base path otherwise
+	button_char_dir.text = out.isEmpty() ? libCombo.currentText : out; button_char_dir.toolTip = 'Select where to export your %1 preset(s). Press shift to open output directory'.arg(kind);
 
 	// Character preset settings
 	if (ctrl.checked)
@@ -866,8 +876,8 @@ function CreateTab5()
 		//==================
 		// Display Character 'Name' line edit
 		//==================
-		var groupbox5_1 = VGroupBox(tab5, 'Character Preset');
-		var layout5_1 = new DzGridLayout(groupbox5_1);
+		const groupbox5_1 = VGroupBox(tab5, 'Character Preset');
+		const layout5_1 = new DzGridLayout(groupbox5_1);
 		charName = LabelledLineEdit(groupbox5_1, layout5_1, 0, 'Name', 30, 'Character Name'); charName.text = product.text; // Infer character name from product name
 
 		//==================
@@ -878,7 +888,7 @@ function CreateTab5()
 		//==================
 		// Display 2 Character 'Card Image' buttons for file browser / file path line edit
 		//==================
-		var groupbox5_3 = new DzHGroupBox(tab5);
+		const groupbox5_3 = new DzHGroupBox(tab5);
 		selectedCard5_1 = CardSelect(groupbox5_3, 256, 256);
 		selectedCard5_2 = CardSelect(groupbox5_3, 91, 91);
 	}
@@ -886,7 +896,7 @@ function CreateTab5()
 	//==================
 	// Display 'Save Character Preset' or 'Save Shaping Preset' button
 	//==================
-	var button_character = Button(tab5, 'Save %1 Preset'.arg(kind));
+	const button_character = Button(tab5, 'Save %1 Preset'.arg(kind));
 	if (ctrl.checked)
 		connect(button_character, 'clicked', CreateCharacter);
 	else connect(button_character, 'clicked', CreateShapingPresets);
@@ -909,8 +919,8 @@ function CreateCharacter()
 
 	logBox.insertItem('\n============== Character Preset ==============');
 
-	var idx = assetIOMgr.findFilter('DzCharacterAssetFilter');
-	var filter = assetIOMgr.getFilter(idx); // DzAssetIOFilter
+	const idx = assetIOMgr.findFilter('DzCharacterAssetFilter');
+	const filter = assetIOMgr.getFilter(idx); // DzAssetIOFilter
 
 	// Dial-in the Head & Body morphs using the controller - Note: head-related morphs (eyelashes...) are driven by the head morph
 	GetController().setValue(1);
@@ -922,7 +932,7 @@ function CreateCharacter()
 		Scene.removeNode(deformer.getBase());
 
 	// Settings
-	var settings = new DzFileIOSettings();
+	const settings = new DzFileIOSettings();
 	filter.getDefaultOptions(settings); // Default settings
 	settings.setBoolValue('WriteShapes', true);
 	settings.setBoolValue('WriteMaterials', doMaterial.checked);
@@ -930,11 +940,11 @@ function CreateCharacter()
 	settings.setBoolValue('RunSilent', true);
 
 	// Post Load settings for attachments (eyelashes, tear, mouth, eyes & eyebrows) - TODO: should probably be automatic (left for later investigation)
-	var file = new DzFile('%1/%2.json'.arg(scriptPath).arg(figName));
+	const file = new DzFile('%1/Post Load Settings/%2.json'.arg(scriptPath).arg(figName));
 	if (file.open(DzFile.ReadOnly)) // Get settings from json file for the figure
 	{
 		settings.setBoolValue('PostLoadEnable', true);
-		var subSettings = new DzSettings();
+		const subSettings = new DzSettings();
 		subSettings.fromString(file.read());
 		settings.setStringValue('PostLoadScriptPath', subSettings.getStringValue('PostLoadScriptPath'));
 		settings.setSettingsValue('PostLoadScriptSettings', subSettings.getSettingsValue('PostLoadScriptSettings'));
@@ -943,8 +953,8 @@ function CreateCharacter()
 	else logBox.insertItem('\u2620 Failed to load Post Load settings ' + file.fileName());
 
 	// Save character preset to dsf file
-	var file = '%1/%2'.arg(button_char_dir.text).arg(charName.text);
-	var error = assetIOMgr.doSaveWithOptions(filter, settings, false, file, button_char_dir.text);
+	const filePath = '%1/%2'.arg(button_char_dir.text).arg(charName.text);
+	const error = assetIOMgr.doSaveWithOptions(filter, settings, true, filePath, button_char_dir.text); // Noye : viewport snapshot disabled
 	logBox.insertItem(error.valueOf() === 0x00000000 ? '\u2714 Character %1 created'.arg(charName.text) : '\u2620 Failed to create character (%1)'.arg(getErrorMessage(error)));
 
 	filter.deleteLater();
@@ -959,12 +969,12 @@ function CreateCharacter()
 //=========================
 function CopyCards2()
 {
-	var cards = [selectedCard5_1.toolTip, selectedCard5_2.toolTip];
-	var names = [charName.text + '.tip.png', charName.text + '.png'];
-	var dir = new DzDir(button_char_dir.text); // Go inside dir
+	const cards = [selectedCard5_1.toolTip, selectedCard5_2.toolTip];
+	const names = [charName.text + '.tip.png', charName.text + '.png'];
+	const dir = new DzDir(button_char_dir.text); // Go inside dir
 
 	// Delete existing cards (including those created by assetIOMgr.doSaveWithOptions()) if they need to be replaced
-	var oldCards = dir.entryList('%1*.png'.arg(charName.text)); // _.duf.png, _.png, _.tip.png
+	const oldCards = dir.entryList('%1*.png'.arg(charName.text)); // _.duf.png, _.png, _.tip.png
 	if (!cards[0].isEmpty() && oldCards.indexOf(names[0]) > -1)
 		dir.remove(names[0]);
 	if (!cards[1].isEmpty() && oldCards.indexOf('%1.duf.png'.arg(charName.text)) > -1)
@@ -976,14 +986,14 @@ function CopyCards2()
 	// Copy image files to Character folder
 	for (var i = 0; i < cards.length; i++)
 	{
-		var card = cards[i];
+		const card = cards[i];
 		if (card.isEmpty())
 			continue;
 
 		// Copy card
-		var name = names[i];
-		var file = new DzFile(card);
-		var success = file.copy('%1/%2'.arg(button_char_dir.text).arg(name));
+		const name = names[i];
+		const file = new DzFile(card);
+		const success = file.copy('%1/%2'.arg(button_char_dir.text).arg(name));
 		logBox.insertItem(success ? '\u2714 Card Image %1 copied'.arg(name) : '\u2620 Failed to copy Card Image %1 : %2'.arg(name).arg(file.errorString()));
 	}
 }
@@ -998,27 +1008,27 @@ function CreateShapingPresets()
 
 	logBox.insertItem('\n============== Shaping Preset(s) ==============');
 
-	var idx = assetIOMgr.findFilter('DzShapingAssetFilter');
-	var filter = assetIOMgr.getFilter(idx); // DzAssetIOFilter
+	const idx = assetIOMgr.findFilter('DzShapingAssetFilter');
+	const filter = assetIOMgr.getFilter(idx); // DzAssetIOFilter
 
 	// Settings
-	var settings = new DzFileIOSettings();
+	const settings = new DzFileIOSettings();
 	filter.getDefaultOptions(settings); // Default settings
 	settings.setBoolValue('SaveCurFrame', true); // Current Frame Only
 	settings.setBoolValue('CompressOutput', compress.checked);
 	settings.setBoolValue('RunSilent', true);
-	var subSetting = settings.setSettingsValue('NodeNames');
+	const subSetting = settings.setSettingsValue('NodeNames');
 
 	// Dial-in the Head & Body morphs then save - Note: head-related morphs (eyelashes...) are driven by the head morph
 	for (const morph of morphs) // Iterate morphs (DzFloatProperty)
 	{
 		morph.setValue(1);
-		var mLabel = morph.getLabel(); // Morph label
+		const mLabel = morph.getLabel(); // Morph label
 		subSetting.setSettingsValue(oNode.getName()).setStringValue('0', mLabel);
 
 		// Save shaping preset to dsf file
-		var file = '%1/%2'.arg(button_char_dir.text).arg(mLabel);
-		var error = assetIOMgr.doSaveWithOptions(filter, settings, false, file);
+		const file = '%1/%2'.arg(button_char_dir.text).arg(mLabel);
+		const error = assetIOMgr.doSaveWithOptions(filter, settings, false, file);
 		logBox.insertItem(error.valueOf() === 0x00000000 ? '\u2714 Shaping preset %1 created'.arg(mLabel) : '\u2620 Failed to create %1 shaping preset (%1)'.arg(mLabel).arg(getErrorMessage(error)));
 
 		trigger_action('DzRestoreFigureAction'); // Restore figure
@@ -1037,20 +1047,20 @@ var deformerIssue = FindDFormer();
 //=========================
 function CopyCards()
 {
-	var cards = [selectedCard.toolTip, selectedCard2.toolTip, selectedCard3.toolTip];
-	var names = [morphName.text, morphName2.text, ctrl_name.text];
+	const cards = [selectedCard.toolTip, selectedCard2.toolTip, selectedCard3.toolTip];
+	const names = [morphName.text, morphName2.text, ctrl_name.text];
 
 	// Copy image files to product folder
 	for (var i = 0; i < cards.length; i++)
 	{
-		var card = cards[i];
+		const card = cards[i];
 		if (card.isEmpty())
 			continue;
-		var file = new DzFile(card);
-		var name = names[i];
-		var prop = helper.findPropertyOnNodeByInternalName(name, oNode);
-		var icon = prop.getPresentation().iconLarge;
-		var success = file.copy('%1/%2'.arg(basePath).arg(icon));
+		const file = new DzFile(card);
+		const name = names[i];
+		const prop = helper.findPropertyOnNodeByInternalName(name, oNode);
+		const icon = prop.getPresentation().iconLarge;
+		const success = file.copy('%1/%2'.arg(libCombo.currentText).arg(icon));
 		logBox.insertItem(success ? '\u2714 Card Image %1 copied'.arg(name) : '\u2620 Failed to copy Card Image %1 : %1'.arg(name).arg(file.errorString()));
 	}
 }
@@ -1063,7 +1073,7 @@ function trigger_action(className)
 	if (!actionMgr) return;
 
 	// Find the action to perform
-	var action = actionMgr.findAction(className);
+	const action = actionMgr.findAction(className);
 	if (!action)
 	{
 		ErrorMessage('Action %1 could not be found'.arg(action.text));
@@ -1086,7 +1096,7 @@ function trigger_action(className)
 //=========================
 function GetProductDir(node)
 {
-	var uri = File2Path(node.assetUri.filePath.substring(1)); // data/DAZ 3D/Genesis 8/Female
+	const uri = File2Path(node.assetUri.filePath.substring(1)); // data/DAZ 3D/Genesis 8/Female
 	return '%1/Morphs/%2/%3'.arg(uri).arg(vendor.text).arg(product.text);
 }
 
@@ -1095,7 +1105,7 @@ function GetProductDir(node)
 //=========================
 function SetPresentation(node, prop, name)
 {
-	var present = new DzPresentation();
+	const present = new DzPresentation();
 	present.type = 'Modifier/Shape';
 	if (node.isRootNode())
 	{
@@ -1128,13 +1138,13 @@ function TweakProperty(prop, node, mLabel, mName, isCtrl)
 function CreateCTRL()
 {
 	// Create a new property
-	var name = ctrl_name.text;
-	var prop = new DzFloatProperty(name, true, true); // 3rd parameter (isUserProperty) is set to true to make it deletable by user
+	const name = ctrl_name.text;
+	const prop = new DzFloatProperty(name, true, true); // 3rd parameter (isUserProperty) is set to true to make it deletable by user
 
 	TweakProperty(prop, oNode, ctrl_label.text, name, true);
 
 	// Add property to oNode
-	var error = oNode.addProperty(prop);
+	const error = oNode.addProperty(prop);
 	if (error.valueOf() !== 0x00000000)
 	{
 		logBox.insertItem('\u2620 %1  |  Error while adding controller to node : %2'.arg(name).arg(getErrorMessage(error)));
@@ -1174,18 +1184,18 @@ function CreateCTRL()
 //=========================
 // Collect neck bone, bone names & head bone names to allow skeleton pruning when Rigging To Shape
 //=========================
-var boneNames = []; // All figure bone names
+const boneNames = []; // All figure bone names
 var neck; // DzNode
-var headNames = []; // Neck + Head bones name
+const headNames = []; // Neck + Head bones name
 
 function GetNeckAndHeadBones()
 {
-	var bones = oNode.getNodeChildren(true);
+	const bones = oNode.getNodeChildren(true);
 
 	// Find Neck bone (named differently for each generation, split starting from G3, always containing 'neck', so we search the root bone name containing 'neck')
 	for (var i = 0; i < bones.length; i++)
 	{
-		var n = bones[i].name; // Bone name
+		const n = bones[i].name; // Bone name
 		boneNames.push(n);
 
 		// Neck found
@@ -1232,7 +1242,7 @@ function GetBonesToExclude(name)
 function AdjustRiggingToShape(name, node)
 {
 	// Create & set
-	var adjuster = new DzShapeRiggingAdjuster();
+	const adjuster = new DzShapeRiggingAdjuster();
 	adjuster.setFigure(node);
 	if (doSplit.checked)
 		adjuster.setExcludedBones(GetBonesToExclude(name));
@@ -1241,8 +1251,8 @@ function AdjustRiggingToShape(name, node)
 	adjuster.setAdjustOrientation(false);
 
 	// Execute
-	var success = adjuster.doAdjustments();
-	var label = node.isRootNode() ? name : node.getLabel();
+	const success = adjuster.doAdjustments();
+	const label = node.isRootNode() ? name : node.getLabel();
 	logBox.insertItem(success ? '\u2714 %1  |  Rigging adjusted to shape'.arg(label) : '\u2620 %1  |  Failed to adjust rigging to shape'.arg(label));
 }
 
@@ -1252,17 +1262,17 @@ function AdjustRiggingToShape(name, node)
 function ERCFreeze(prop, name, node)
 {
 	// 'Control Property Selection'
-	var freezer = new DzERCFreeze();
+	const freezer = new DzERCFreeze();
 	freezer.setControllerNode(node);
 	freezer.setControllerProperty(prop);
 
 	// Build the list of nodes with properties to freeze
-	var nodes = node.inherits('DzSkeleton') ? [node].concat(node.getAllBones()) : [node];
+	const nodes = node.inherits('DzSkeleton') ? [node].concat(node.getAllBones()) : [node];
 
 	// Also include non-morphed head attachments, we'll freeze their transforms (local position, rotation & scale)
 	if (morphName.text === name)
 	{
-		var nonMorphed = attachments.filter(x => !selection.includes(x));
+		const nonMorphed = attachments.filter(x => !selection.includes(x));
 		for (const morph of nonMorphed)
 			nodes.push(morph);
 	}
@@ -1294,8 +1304,8 @@ function ERCFreeze(prop, name, node)
 	freezer.setRestoreRigging(true);
 
 	// Execute
-	var success = freezer.doFreeze();
-	var label = node.isRootNode() ? name : node.getLabel();
+	const success = freezer.doFreeze();
+	const label = node.isRootNode() ? name : node.getLabel();
 	logBox.insertItem(success ? '\u2714 %1  |  ERC freezed (%2 bones)'.arg(label).arg(unic.size) : '\u2620 %1  |  ERC freeze failure'.arg(label));
 }
 
@@ -1304,24 +1314,24 @@ function ERCFreeze(prop, name, node)
 //=========================
 function WriteMorph(node, mName)
 {
-	var idx = assetIOMgr.findFilter('DzMorphSupportAssetFilter');
-	var filter = assetIOMgr.getFilter(idx); // DzAssetIOFilter
+	const idx = assetIOMgr.findFilter('DzMorphSupportAssetFilter');
+	const filter = assetIOMgr.getFilter(idx); // DzAssetIOFilter
 
 	// Settings
-	var settings = new DzFileIOSettings();
+	const settings = new DzFileIOSettings();
 	filter.getDefaultOptions(settings); // Default settings
 	settings.setStringValue('RootLabel', node.getLabel());
-	settings.setStringValue('BaseDataPath', basePath); // Absolute path to Content Library for the selected figure
+	settings.setStringValue('BaseDataPath', libCombo.currentText); // Absolute path to Content Library
 	settings.setStringValue('VendorName', vendor.text);
 	settings.setStringValue('ProductName', product.text);
 	settings.setBoolValue('CompressOutput', compress.checked);
 	settings.setBoolValue('RunSilent', true);
-	var subSetting = settings.setSettingsValue('NodeNames');
+	const subSetting = settings.setSettingsValue('NodeNames');
 	subSetting.setSettingsValue(node.getName()).setStringValue('0', mName);
 
 	// Save morph to dsf file
-	var error = assetIOMgr.doSaveWithOptions(filter, settings);
-	var label = node.isRootNode() ? mName : node.getLabel();
+	const error = assetIOMgr.doSaveWithOptions(filter, settings);
+	const label = node.isRootNode() ? mName : node.getLabel();
 	logBox.insertItem(error.valueOf() === 0x00000000 ? '\u2714 %1  |  Saved to file'.arg(label) : '\u2620 %1  |  Error while writing to file : %2'.arg(label).arg(getErrorMessage(error)));
 	filter.deleteLater();
 }
@@ -1335,22 +1345,22 @@ function CreateOtherDeltas(node)
 	if (normalize.checked)
 		node.update();
 
-	var srcFig = node.getObject().getCurrentShape().getGeometry(); // Base geometry
-	var tgtFig = node.getObject().getCachedGeom(); // Morphed geometry
+	const srcFig = node.getObject().getCurrentShape().getGeometry(); // Base geometry
+	const tgtFig = node.getObject().getCachedGeom(); // Morphed geometry
 
-	var deltas = new DzMorphDeltas();
+	const deltas = new DzMorphDeltas();
 
 	for (var i = 0; i < srcFig.getNumVertices(); i++) // Iterate src vertices
 	{
-		var v1 = srcFig.getVertex(i); // Base vertex
-		var v2 = tgtFig.getVertex(i); // Morphed & transformed vertex
+		const v1 = srcFig.getVertex(i); // Base vertex
+		const v2 = tgtFig.getVertex(i); // Morphed & transformed vertex
 
 		// Apply Y offset - Note: in 'normalized' mode, we've already removed the offset (offset = 0)
 		if (doSplit.checked && !normalize.checked)
 			v2.y -= offset;
 
 		// Store delta
-		var delta = v2.subtract(v1);
+		const delta = v2.subtract(v1);
 		deltas.addDelta(i, delta);
 	}
 
@@ -1362,12 +1372,12 @@ function CreateOtherDeltas(node)
 //=========================
 function CreateDeltas(invert)
 {
-	var deltas = new DzMorphDeltas();
+	const deltas = new DzMorphDeltas();
 
 	for (var i = 0; i < src.getNumVertices(); i++) // Iterate src vertices
 	{
-		var v1 = src.getVertex(i); // Base vertex
-		var v2 = tgt.getVertex(i); // Morphed & transformed vertex
+		const v1 = src.getVertex(i); // Base vertex
+		const v2 = tgt.getVertex(i); // Morphed & transformed vertex
 
 		if (weights) // D-Former weight for this vertex
 		{
@@ -1399,17 +1409,17 @@ function CreateDeltas(invert)
 //=========================
 function CreateMorph(node, deltas, mLabel, mName, mPath)
 {
-	var mod = new DzMorph(deltas);
+	const mod = new DzMorph(deltas);
 	mod.setName(mName);
 
-	var error = node.getObject().addModifier(mod);
+	const error = node.getObject().addModifier(mod);
 	if (error.valueOf() !== 0x00000000)
 	{
 		logBox.insertItem('\u2620 %1  |  Error while adding morph to node : %2'.arg(mName).arg(getErrorMessage(error)));
 		return;
 	}
 
-	var prop = mod.getValueControl(); // DzFloatProperty
+	const prop = mod.getValueControl(); // DzFloatProperty
 
 	if (prop !== null)
 	{
@@ -1430,7 +1440,7 @@ function CreateMorph(node, deltas, mLabel, mName, mPath)
 function CreateDeltasMorph(node, invert, mLabel, mName, mPath)
 {
 	// Create weighted deltas
-	var deltas = node.isRootNode() ? CreateDeltas(invert) : CreateOtherDeltas(node);
+	const deltas = node.isRootNode() ? CreateDeltas(invert) : CreateOtherDeltas(node);
 
 	// Create morph
 	CreateMorph(node, deltas, mLabel, mName, mPath);
@@ -1450,7 +1460,7 @@ function GetWeights()
 	// File may be a Daz JSON Link
 	if (!file.exists())
 	{
-		var file2 = new DzFile(file.filePath() + '.djl');
+		const file2 = new DzFile(file.filePath() + '.djl');
 		if (file2.open(DzFile.ReadOnly))
 		{
 			try { file = new DzFile(FullPathChecked(JSON.parse(file2.read()).path)); }
@@ -1462,15 +1472,15 @@ function GetWeights()
 	{
 		try
 		{
-			var data = JSON.parse(file.read());
-			var weightsVal = data.modifier_library[0].dform.influence_weights.values; // [[vertex idx, weight]]
+			const data = JSON.parse(file.read());
+			const weightsVal = data.modifier_library[0].dform.influence_weights.values; // [[vertex idx, weight]]
 
 			// Store weights in a DzWeightMap
 			weights = new DzWeightMap();
 			weights.setNumWeights(data.modifier_library[0].dform.influence_vertex_count); // Note : contrary to method name & documentation, this is not influence_weights.count
 			for (const val of weightsVal)
 			{
-				var [idx, weight] = val;
+				const [idx, weight] = val;
 				weights.setFloatWeight(idx, weight);
 			}
 		}
@@ -1515,9 +1525,9 @@ function FindDFormer()
 		}
 
 		// Check matching number of vertices with base figure
-		var geom = oNode.getObject().getCurrentShape().getGeometry();
-		var numWeights = weights.getNumWeights();
-		var numVerts = geom.getNumVertices();
+		const geom = oNode.getObject().getCurrentShape().getGeometry();
+		const numWeights = weights.getNumWeights();
+		const numVerts = geom.getNumVertices();
 		if (numWeights === numVerts)
 		{
 			// D-Former OK, get Reference Vertex
@@ -1526,13 +1536,13 @@ function FindDFormer()
 
 			for (var i = 0; i < geom.getNumVertices(); i++) // Iterate vertices
 			{
-				var wgt = weights.getFloatWeight(i);
+				const wgt = weights.getFloatWeight(i);
 
 				// Reference Vertex is neither on head (weight=1) nore on body (weight=0)
 				if (wgt === 0 || wgt === 1)
 					continue;
 
-				var v = geom.getVertex(i); // DzVec3
+				const v = geom.getVertex(i); // DzVec3
 
 				// Reference Vertex is on the central edge loop and on front
 				if (v.x === 0 && v.z > 0)
@@ -1560,7 +1570,7 @@ function FindDFormer()
 //=========================
 function ValidateSetup()
 {
-	var errors = [];
+	const errors = [];
 
 	// Check for empty fields
 	if (morphName.text.isEmpty())
@@ -1631,7 +1641,7 @@ function Execute()
 	// Set resolution to 'Base' & 'SubD' to 0 for each figure
 	for (const fig of selection)
 	{
-		var shape = fig.getObject().getCurrentShape(); // DzShape
+		const shape = fig.getObject().getCurrentShape(); // DzShape
 		shape.findProperty('lodlevel').setValueFromString('Base'); // Resolution Level
 		shape.findProperty('SubDIALevel').setValue(0); // SubDivision Level
 	}
@@ -1643,8 +1653,8 @@ function Execute()
 	// Translate or scale figure based on reference vertex Y
 	if (doSplit.checked || (!doSplit.checked && normalize.checked))
 	{
-		var rv1 = src.getVertex(parseInt(refVertex.text)).y; // Base vertex
-		var rv2 = tgt.getVertex(parseInt(refVertex.text)).y; // Morphed vertex
+		const rv1 = src.getVertex(parseInt(refVertex.text)).y; // Base vertex
+		const rv2 = tgt.getVertex(parseInt(refVertex.text)).y; // Morphed vertex
 
 		if (normalize.checked) // 'Normalized' mode
 		{
@@ -1676,8 +1686,8 @@ function Execute()
 	// Finalize morph creation & save as morph asset
 	for (const prop of morphs) // Iterate morphs (DzProperty)
 	{
-		var morph = prop.getOwner();
-		var node = morph.getElementParent().getElementParent(); // Morph node (morph < object < node)
+		const morph = prop.getOwner();
+		const node = morph.getElementParent().getElementParent(); // Morph node (morph < object < node)
 
 		// Restore figure
 		trigger_action('DzRestoreFigureAction');
@@ -1690,8 +1700,8 @@ function Execute()
 			// For WYSIWYG body morph : restore initial figure position & Apply offset to root bone (hip) - Note: in normalized mode, we've removed the offset (offset = 0)
 			if (morph.name === morphName2.text && !normalize.checked)
 			{
-				var root = oNode.getAllBones()[0];
-				var pos = root.getWSPos();
+				const root = oNode.getAllBones()[0];
+				const pos = root.getWSPos();
 				root.setWSPos(pos.add(new DzVec3(0, offset, 0)));
 			}
 
