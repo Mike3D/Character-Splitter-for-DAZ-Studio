@@ -1,6 +1,7 @@
 
 Version 5 :
-- bypass the 'D-Former Load Options' popup by getting head split D-Former weights from duf file. This simplifies the workflow and avoids polluting the scene with the D-Former
+- bypass the 'D-Former Load Options' popup by getting head split D-Former weights from duf file. This simplifies the workflow and avoids polluting the scene with the D-Former components
+- user can now choose which content library to use for exports (from Settings tab)
 - improved morphs deletion
 - use Daz JSON Links instead of symlinks and move D-Formers to a nested subfolder
 - added a script to create Daz JSON Links for newer Daz figures
